@@ -39,7 +39,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          file: "{context}/Dockerfile_dev"
+          file: "{{defaultContext}}/Dockerfile_dev"
           tags: ghcr.io/devcraftftw/geekconsole:${{ github.run_id }}
           target: gc
           cache-from: type=gha
