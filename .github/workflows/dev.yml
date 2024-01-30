@@ -39,6 +39,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
+          file: "{context}/Dockerfile_dev"
           tags: ghcr.io/devcraftftw/geekconsole:${{ github.run_id }}
           target: gc
           cache-from: type=gha
@@ -259,6 +260,7 @@ jobs:
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
+          file: "{context}/Dockerfile_dev"
           cache-from: type=gha
           cache-to: type=gha,mode=max
           # platforms: linux/amd64,linux/arm64,linux/arm/v7
