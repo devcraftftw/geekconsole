@@ -90,10 +90,10 @@ export default function ProfileRoute() {
 export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
 	const displayName = data?.user.name ?? params.username;
 	return [
-		{ title: `${displayName} | Geek Console` },
+		{ title: `${displayName} | GeekConsole` },
 		{
 			name: 'description',
-			content: `Profile of ${displayName} on Geek Console`,
+			content: `Profile of ${displayName} on GeekConsole`,
 		},
 	];
 };

@@ -239,7 +239,7 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	return [
-		{ title: data ? 'Geek Console' : 'Error | Geek Console' },
+		{ title: data ? 'GeekConsole' : 'Error | GeekConsole' },
 		{ name: 'description', content: `Your favourite geek storage` },
 	];
 };

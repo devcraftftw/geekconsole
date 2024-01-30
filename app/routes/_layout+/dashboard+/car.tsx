@@ -93,7 +93,7 @@ type DataTableProps<TData, TValue> = {
 
 export const meta: MetaFunction = () => {
 	return [
-		{ title: 'Car expenses | Geek Console' },
+		{ title: 'Car expenses | GeekConsole' },
 		{ name: 'description', content: 'Track your car expenses with ease' },
 	];
 };

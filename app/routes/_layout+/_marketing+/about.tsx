@@ -1,6 +1,3 @@
-/* eslint-disable tailwindcss/classnames-order */
-// FIXME something is conflicting with this rule
-
 import { type MetaFunction } from '@remix-run/node';
 import { cn } from '~/app/shared/lib/utils/index.ts';
 import {
@@ -11,7 +8,7 @@ import {
 } from '~/app/shared/ui/index.ts';
 import { logos } from './logos/logos.ts';
 
-export const meta: MetaFunction = () => [{ title: 'Geek Console' }];
+export const meta: MetaFunction = () => [{ title: 'GeekConsole' }];
 
 const columnClasses: Record<(typeof logos)[number]['column'], string> = {
 	1: 'xl:col-start-1',

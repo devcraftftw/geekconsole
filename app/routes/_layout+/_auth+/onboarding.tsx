@@ -293,5 +293,5 @@ export default function OnboardingRoute() {
 }
 
 export const meta: MetaFunction = () => {
-	return [{ title: 'Setup Geek Console Account' }];
+	return [{ title: 'Setup GeekConsole Account' }];
 };

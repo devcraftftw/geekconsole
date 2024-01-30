@@ -237,7 +237,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 			: 'No description';
 
 	return [
-		{ title: `${bookName} | Geek Console` },
+		{ title: `${bookName} | GeekConsole` },
 		{ name: 'description', content: bookSummary },
 	];
 };
