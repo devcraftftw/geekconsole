@@ -12,7 +12,7 @@ import { Button } from '~/app/shared/ui/index.ts';
 
 export const meta: MetaFunction = () => {
 	return [
-		{ title: 'Books collection | Geek Console' },
+		{ title: 'Books collection | GeekConsole' },
 		{ name: 'description', content: 'Your precious books collection' },
 	];
 };

@@ -1,7 +1,7 @@
 import { type MetaFunction } from '@remix-run/node';
 
 export const meta: MetaFunction = () => {
-	return [{ title: 'Geek Console' }];
+	return [{ title: 'GeekConsole' }];
 };
 
 export default function Index() {

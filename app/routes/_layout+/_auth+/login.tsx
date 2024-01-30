@@ -390,7 +390,7 @@ export default function LoginPage() {
 }
 
 export const meta: MetaFunction = () => {
-	return [{ title: 'Login to Geek Console' }];
+	return [{ title: 'Login to GeekConsole' }];
 };
 
 export function ErrorBoundary() {

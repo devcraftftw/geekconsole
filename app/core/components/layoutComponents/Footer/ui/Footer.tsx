@@ -3,7 +3,7 @@ import { Button } from '~/app/shared/ui/index.ts';
 
 export const Footer = () => {
 	return (
-		<footer className="w-full border-t border-foreground py-8">
+		<footer className="w-full border-t border-foreground/10 py-8">
 			<div className="mx-auto w-full px-4 pt-6 lg:px-20">
 				<div className="mx-auto w-full">
 					<div className="xl:grid xl:grid-cols-5 xl:gap-8">
@@ -108,7 +108,7 @@ export const Footer = () => {
 						</div>
 					</div>
 
-					<div className="mt-16 border-t border-foreground/30 pt-8 sm:mt-20 lg:mt-8">
+					<div className="mt-16 border-t border-foreground/5 pt-8 sm:mt-20 lg:mt-8">
 						<p className="text-sm leading-5 text-foreground">
 							Copyright @ {new Date().getFullYear()} GeekConsole. All Rights
 							Reserved.

@@ -93,7 +93,7 @@ type DataTableProps<TData, TValue> = {
 
 export const meta: MetaFunction = () => {
 	return [
-		{ title: 'Car expenses | Geek Console' },
+		{ title: 'Car expenses | GeekConsole' },
 		{ name: 'description', content: 'Track your car expenses with ease' },
 	];
 };
@@ -107,7 +107,7 @@ export default function CarRoute() {
 	return (
 		<>
 			<div className="flex w-full flex-col gap-6">
-				<Button asChild className="w-2/12">
+				<Button asChild className="w-3/12">
 					<Link to="new">Add new expense</Link>
 				</Button>
 

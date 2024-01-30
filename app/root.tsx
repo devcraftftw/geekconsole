@@ -60,8 +60,8 @@ export const links: LinksFunction = () =>
 		cssBundleHref ? { rel: 'preload', href: cssBundleHref, as: 'style' } : null,
 		{
 			rel: 'icon',
-			type: 'image/png',
-			href: 'https://i.ibb.co/31W7B1y/Png-Item-1032462.png',
+			type: 'image/ico',
+			href: '/favicon.ico',
 		},
 		{
 			rel: 'stylesheet',
@@ -239,7 +239,7 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	return [
-		{ title: data ? 'Geek Console' : 'Error | Geek Console' },
+		{ title: data ? 'GeekConsole' : 'Error | GeekConsole' },
 		{ name: 'description', content: `Your favourite geek storage` },
 	];
 };

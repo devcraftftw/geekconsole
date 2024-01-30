@@ -311,5 +311,5 @@ export default function SignupRoute() {
 }
 
 export const meta: MetaFunction = () => {
-	return [{ title: 'Setup Geek Console Account' }];
+	return [{ title: 'Setup GeekConsole Account' }];
 };

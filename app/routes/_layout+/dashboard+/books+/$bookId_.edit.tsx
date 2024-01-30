@@ -16,7 +16,7 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 
 export const meta: MetaFunction = () => {
 	return [
-		{ title: 'Edit book | Geek Console' },
+		{ title: 'Edit book | GeekConsole' },
 		{ name: 'description', content: 'Edit your favourite book here' },
 	];
 };

@@ -125,16 +125,16 @@ export default function EditUserProfile() {
 	return (
 		<div className="flex flex-col gap-12">
 			<div className="flex justify-center">
-				<div className="relative h-52 w-52">
+				<div className="relative size-52">
 					<img
 						src={getUserImgSrc(data.user.image?.id)}
 						alt={data.user.username}
-						className="h-full w-full rounded-full object-cover"
+						className="size-full rounded-full object-cover"
 					/>
 					<Button
 						asChild
 						variant="outline"
-						className="absolute -right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full p-0"
+						className="absolute -right-3 top-3 flex size-10 items-center justify-center rounded-full p-0"
 					>
 						<Link
 							preventScrollReset
@@ -142,7 +142,7 @@ export default function EditUserProfile() {
 							title="Change profile photo"
 							aria-label="Change profile photo"
 						>
-							<Icon name="camera" className="h-4 w-4" />
+							<Icon name="camera" className="size-4" />
 						</Link>
 					</Button>
 				</div>

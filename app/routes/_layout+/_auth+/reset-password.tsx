@@ -175,7 +175,7 @@ export default function ResetPasswordRoute() {
 }
 
 export const meta: MetaFunction = () => {
-	return [{ title: 'Reset Password | Geek Console' }];
+	return [{ title: 'Reset Password | GeekConsole' }];
 };
 
 export function ErrorBoundary() {

@@ -14,7 +14,7 @@ import { Icon } from '~/app/shared/ui/index.ts';
 
 export const meta: MetaFunction = () => {
 	return [
-		{ title: 'Dashboard | Geek Console' },
+		{ title: 'Dashboard | GeekConsole' },
 		{ name: 'description', content: 'This is your dashboard' },
 	];
 };
