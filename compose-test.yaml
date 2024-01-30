@@ -1,0 +1,10 @@
+services:
+  geekconsole:
+    image: "${TESTING_IMAGE}"
+  
+  geekconsole-curl:
+    image: "${TESTING_IMAGE}"
+    depends_on:
+      geekconsole:
+        condition: service_started
+    command: sleep 10 && curl --fail http://geekconsole:3000 || exit 1
