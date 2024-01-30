@@ -43,7 +43,7 @@ export default function ProfileRoute() {
 							<img
 								src={getUserImgSrc(data.user.image?.id)}
 								alt={userDisplayName}
-								className="h-52 w-52 rounded-full object-cover"
+								className="size-52 rounded-full object-cover"
 							/>
 						</div>
 					</div>
