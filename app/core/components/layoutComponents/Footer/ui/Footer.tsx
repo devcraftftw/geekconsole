@@ -108,7 +108,7 @@ export const Footer = () => {
 						</div>
 					</div>
 
-					<div className="mt-16 border-t border-foreground/30 pt-8 sm:mt-20 lg:mt-8">
+					<div className="mt-16 border-t border-foreground/5 pt-8 sm:mt-20 lg:mt-8">
 						<p className="text-sm leading-5 text-foreground">
 							Copyright @ {new Date().getFullYear()} GeekConsole. All Rights
 							Reserved.
