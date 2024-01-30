@@ -1,0 +1,245 @@
+import { invariantResponse } from '@epic-web/invariant';
+import { type SEOHandle } from '@nasa-gcn/remix-seo';
+import {
+	type HeadersFunction,
+	json,
+	type ActionFunctionArgs,
+	type LoaderFunctionArgs,
+	type SerializeFrom,
+} from '@remix-run/node';
+import { useFetcher, useLoaderData } from '@remix-run/react';
+import { useState } from 'react';
+import {
+	type ProviderName,
+	ProviderNameSchema,
+	providerNames,
+	ProviderConnectionForm,
+	providerIcons,
+} from '~/app/core/components/providers/index.ts';
+import {
+	createToastHeaders,
+	makeTimings,
+	prisma,
+	requireUserId,
+	resolveConnectionData,
+} from '~/app/core/server/index.ts';
+import { type BreadcrumbHandle } from '~/app/shared/schemas/index.ts';
+import {
+	Icon,
+	StatusButton,
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from '~/app/shared/ui/index.ts';
+
+export const handle: BreadcrumbHandle & SEOHandle = {
+	breadcrumb: <Icon name="link-2">Connections</Icon>,
+	getSitemapEntries: () => null,
+};
+
+async function userCanDeleteConnections(userId: string) {
+	const user = await prisma.user.findUnique({
+		select: {
+			password: { select: { userId: true } },
+			_count: { select: { connections: true } },
+		},
+		where: { id: userId },
+	});
+
+	// user can delete their connections if they have a password
+	if (user?.password) return true;
+
+	// users have to have more than one remaining connection to delete one
+	return Boolean(user?._count.connections && user?._count.connections > 1);
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+	const userId = await requireUserId(request);
+
+	const timings = makeTimings('profile connections loader');
+
+	const rawConnections = await prisma.connection.findMany({
+		select: { id: true, providerName: true, providerId: true, createdAt: true },
+		where: { userId },
+	});
+
+	const connections: Array<{
+		providerName: ProviderName;
+		id: string;
+		displayName: string;
+		link?: string | null;
+		createdAtFormatted: string;
+	}> = [];
+
+	for (const connection of rawConnections) {
+		const r = ProviderNameSchema.safeParse(connection.providerName);
+
+		if (!r.success) continue;
+
+		const providerName = r.data;
+
+		const connectionData = await resolveConnectionData(
+			providerName,
+			connection.providerId,
+			{ timings },
+		);
+
+		connections.push({
+			...connectionData,
+			providerName,
+			id: connection.id,
+			createdAtFormatted: connection.createdAt.toLocaleString(),
+		});
+	}
+
+	return json(
+		{
+			connections,
+			canDeleteConnections: await userCanDeleteConnections(userId),
+		},
+		{ headers: { 'Server-Timing': timings.toString() } },
+	);
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+	const userId = await requireUserId(request);
+
+	const formData = await request.formData();
+
+	invariantResponse(
+		formData.get('intent') === 'delete-connection',
+		'Invalid intent',
+	);
+
+	invariantResponse(
+		await userCanDeleteConnections(userId),
+		'You cannot delete your last connection unless you have a password.',
+	);
+
+	const connectionId = formData.get('connectionId');
+
+	invariantResponse(typeof connectionId === 'string', 'Invalid connectionId');
+
+	await prisma.connection.delete({
+		where: {
+			id: connectionId,
+			userId: userId,
+		},
+	});
+
+	const toastHeaders = await createToastHeaders({
+		title: 'Deleted',
+		description: 'Your connection has been deleted.',
+	});
+
+	return json({ status: 'success' } as const, { headers: toastHeaders });
+}
+
+export default function Connections() {
+	const data = useLoaderData<typeof loader>();
+
+	return (
+		<div className="mx-auto max-w-md">
+			{data.connections.length ? (
+				<div className="flex flex-col gap-2">
+					<p>Here are your current connections:</p>
+					<ul className="flex flex-col gap-4">
+						{data.connections.map((c) => (
+							<li key={c.id}>
+								<Connection
+									connection={c}
+									canDelete={data.canDeleteConnections}
+								/>
+							</li>
+						))}
+					</ul>
+				</div>
+			) : (
+				<p>You don't have any connections yet.</p>
+			)}
+			<div className="mt-5 flex flex-col gap-5 border-y-2 border-border py-3">
+				{providerNames.map((providerName) => (
+					<ProviderConnectionForm
+						key={providerName}
+						type="Connect"
+						providerName={providerName}
+					/>
+				))}
+			</div>
+		</div>
+	);
+}
+
+function Connection({
+	connection,
+	canDelete,
+}: {
+	connection: SerializeFrom<typeof loader>['connections'][number];
+	canDelete: boolean;
+}) {
+	const deleteFetcher = useFetcher<typeof action>();
+	const [infoOpen, setInfoOpen] = useState(false);
+	const icon = providerIcons[connection.providerName];
+
+	return (
+		<div className="flex justify-between gap-2">
+			<span className={`inline-flex items-center gap-1.5`}>
+				{icon}
+				<span>
+					{connection.link ? (
+						<a href={connection.link} className="underline">
+							{connection.displayName}
+						</a>
+					) : (
+						connection.displayName
+					)}{' '}
+					({connection.createdAtFormatted})
+				</span>
+			</span>
+			{canDelete ? (
+				<deleteFetcher.Form method="POST">
+					<input name="connectionId" value={connection.id} type="hidden" />
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<StatusButton
+									name="intent"
+									value="delete-connection"
+									variant="destructive"
+									size="sm"
+									status={
+										deleteFetcher.state !== 'idle'
+											? 'pending'
+											: deleteFetcher.data?.status ?? 'idle'
+									}
+								>
+									<Icon name="cross-1" />
+								</StatusButton>
+							</TooltipTrigger>
+							<TooltipContent>Disconnect this account</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+				</deleteFetcher.Form>
+			) : (
+				<TooltipProvider>
+					<Tooltip open={infoOpen} onOpenChange={setInfoOpen}>
+						<TooltipTrigger onClick={() => setInfoOpen(true)}>
+							<Icon name="question-mark-circled"></Icon>
+						</TooltipTrigger>
+						<TooltipContent>
+							You cannot delete your last connection unless you have a password.
+						</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
+			)}
+		</div>
+	);
+}
+
+export const headers: HeadersFunction = ({ loaderHeaders }) => {
+	const headers = {
+		'Server-Timing': loaderHeaders.get('Server-Timing') ?? '',
+	};
+	return headers;
+};

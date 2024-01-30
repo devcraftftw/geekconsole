@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  geekconsole:
+    container_name: ${CD_CONTAINER_NAME}-${CI_COMMIT_REF_SLUG}
+    image: registry.gitlab.devcraft.app/broz/geek-console:${CI_COMMIT_REF_SLUG}-${IMAGE_TAG_FRONT}
+    restart: unless-stopped
+    environment:
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - HONEYPOT_SECRET=${HONEYPOT_SECRET}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - INTERNAL_COMMAND_TOKEN=${INTERNAL_COMMAND_TOKEN}
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

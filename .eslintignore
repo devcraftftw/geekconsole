@@ -1,0 +1,14 @@
+node_modules
+
+/.cache
+/build
+/public/build
+.env
+
+entry.client.tsx
+entry.server.tsx
+remix.config.js
+remix.env.d.ts
+postcss.config.js
+commitlint.config.js
+

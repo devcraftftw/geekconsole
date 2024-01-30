@@ -1,0 +1,15 @@
+deploy_dev:
+  stage: deploy
+  extends: .deploy_template
+  variables:
+    DOCKER_HOST: 'tcp://$CD_DEV_HOST:2376'
+    ENV_UPC: DEV
+    SUPABASE_ANON_KEY: $CD_SUPABASE_DEV_ANON_KEY
+    SUPABASE_API_URL: $CD_SUPABASE_DEV_API_URL
+    SESSION_SECRET: $SESSION_SECRET_DEV
+    HONEYPOT_SECRET: $HONEYPOT_SECRET_DEV
+    DATABASE_URL: $DATABASE_URL_DEV
+  only:
+    refs:
+      - develop
+      

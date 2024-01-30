@@ -1,0 +1,15 @@
+stages:
+  # - test
+  - build
+  - deploy
+
+include:
+  # - template: Jobs/SAST.gitlab-ci.yml
+  - local: .gitlab/build_template.yaml
+  - local: .gitlab/build_dev.yaml
+  # - local: .gitlab/build_stage.yaml
+  # - local: .gitlab/build_prod.yaml
+  - local: .gitlab/deploy_template.yaml
+  - local: .gitlab/deploy_dev.yaml
+  # - local: .gitlab/deploy_stage.yaml
+  # - local: .gitlab/deploy_prod.yaml

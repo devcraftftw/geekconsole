@@ -1,0 +1,34 @@
+.deploy_template:
+  stage: deploy
+  image: docker:20.10.16
+  # services:
+  #   - docker:20.10.16-dind
+  tags:
+    - nether
+  script:
+    - mkdir -p $DOCKER_CERT_PATH
+    - cd $DOCKER_CERT_PATH
+    - echo $ENV_UPC
+    - export TMP="CD_${ENV_UPC}_CA_PEM"
+    - OUTPUT=$(eval "echo \$${TMP}") && cat "$OUTPUT" > ca.pem
+    - export TMP="CD_${ENV_UPC}_CERT_PEM"
+    - OUTPUT=$(eval "echo \$${TMP}") && cat "$OUTPUT" > cert.pem
+    - export TMP="CD_${ENV_UPC}_KEY_PEM"
+    - OUTPUT=$(eval "echo \$${TMP}") && cat "$OUTPUT" > key.pem
+    - cat ca.pem
+    - cat cert.pem
+    - cat key.pem
+    - ls
+    - cd -
+    - pwd
+    - echo $DOCKER_HOST
+    - docker info
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker rm -f $CD_CONTAINER_NAME-$CI_COMMIT_REF_SLUG || true
+    - docker compose up -d
+    - rm -rf $DOCKER_CERT_PATH
+  variables:
+    COMPOSE_PROJECT_NAME: geekconsole-$CI_COMMIT_REF_SLUG
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: /certs
+    DOCKER_TLS_CERTDIR: ''

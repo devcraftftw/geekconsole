@@ -1,0 +1,11 @@
+deploy_prod:
+  stage: deploy
+  extends: .deploy_template
+  variables:
+    DOCKER_HOST: 'tcp://$CD_PROD_HOST:2376'
+    ENV_UPC: PROD
+    SUPABASE_ANON_KEY: ${CD_SUPABASE_PROD_ANON_KEY}
+    SUPABASE_API_URL: ${CD_SUPABASE_PROD_API_URL}
+  only:
+    refs:
+      - main

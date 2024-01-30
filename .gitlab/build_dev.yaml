@@ -1,0 +1,23 @@
+build_dev:
+  stage: build
+  extends: .build_template
+  variables:
+    GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+    GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+  only:
+    refs:
+      - develop
+  # except:
+  #   changes:
+  #     - .docker/docs/**/*
+
+build_dev_manual:
+  stage: build
+  extends: .build_template
+  variables:
+    GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+    GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+  when: manual
+  only:
+    refs:
+      - develop

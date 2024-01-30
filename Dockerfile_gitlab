@@ -1,0 +1,102 @@
+# base node image
+FROM node:20-bookworm-slim as base
+
+# set for base and all layer that inherit from it
+ENV NODE_ENV production
+
+# Install openssl for Prisma
+RUN apt-get update && apt-get install -y fuse3 openssl sqlite3 ca-certificates
+
+# Install all node_modules, including dev dependencies
+FROM base as deps
+
+WORKDIR /app
+
+# RUN npm cache clean --force
+
+# ADD package.json package-lock.json .npmrc ./
+ADD package.json package-lock.json .npmrc ./
+# RUN npm cache clean --force
+RUN npm install --include=dev
+
+# Setup production node_modules
+FROM base as production-deps
+
+WORKDIR /app
+
+COPY --from=deps /app/node_modules /app/node_modules
+ADD package.json package-lock.json .npmrc ./
+# RUN npm prune --omit=dev
+RUN npm ci --only=production
+
+# Build the app
+FROM base as build
+
+WORKDIR /app
+
+COPY --from=deps /app/node_modules /app/node_modules
+
+ADD . .
+
+RUN npm run build
+
+# Finally, build the production image with minimal footprint
+FROM base as gc
+
+ENV LITEFS_DIR="/litefs/data"
+ENV DATABASE_URL="file:./data.db"
+ENV DATABASE_PATH="./prisma/data.db"
+ENV CACHE_DATABASE_PATH="./other/cache.db"
+
+ENV GITHUB_CLIENT_ID=$GITHUB_CLIENT_ID
+ENV GITHUB_CLIENT_SECRET=$GITHUB_CLIENT_SECRET
+ENV GITHUB_TOKEN=$GITHUB_TOKEN
+
+ARG GITHUB_CLIENT_ID
+ARG GITHUB_CLIENT_SECRET
+
+# add shortcut for connecting to database CLI
+RUN echo "#!/bin/sh\nset -x\nsqlite3 \$DATABASE_URL" > /usr/local/bin/database-cli && chmod +x /usr/local/bin/database-cli
+
+WORKDIR /app
+
+COPY --from=production-deps /app/node_modules /app/node_modules
+
+COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
+COPY --from=build /app/node_modules/@faker-js /app/node_modules/@faker-js
+COPY --from=build /app/node_modules/enforce-unique /app/node_modules/enforce-unique
+COPY --from=build /app/node_modules/fs-extra /app/node_modules/fs-extra
+COPY --from=build /app/node_modules/graceful-fs /app/node_modules/graceful-fs
+COPY --from=build /app/node_modules/msw /app/node_modules/msw
+COPY --from=build /app/node_modules/outvariant /app/node_modules/outvariant
+COPY --from=build /app/node_modules/strict-event-emitter /app/node_modules/strict-event-emitter
+COPY --from=build /app/node_modules/@mswjs/interceptors /app/node_modules/@mswjs/interceptors
+COPY --from=build /app/node_modules/@open-draft/until /app/node_modules/@open-draft/until
+COPY --from=build /app/node_modules/@open-draft/deferred-promise /app/node_modules/@open-draft/deferred-promise
+COPY --from=build /app/node_modules/is-node-process /app/node_modules/is-node-process
+COPY --from=build /app/node_modules/@bundled-es-modules/statuses /app/node_modules/@bundled-es-modules/statuses
+COPY --from=build /app/node_modules/@bundled-es-modules/cookie /app/node_modules/@bundled-es-modules/cookie
+COPY --from=build /app/node_modules/@mswjs/cookies /app/node_modules/@mswjs/cookies
+COPY --from=build /app/node_modules/graphql /app/node_modules/graphql
+COPY --from=build /app/node_modules/@bundled-es-modules/js-levenshtein /app/node_modules/@bundled-es-modules/js-levenshtein
+COPY --from=build /app/node_modules/headers-polyfill /app/node_modules/headers-polyfill
+COPY --from=build /app/node_modules/@open-draft/logger /app/node_modules/@open-draft/logger
+COPY --from=build /app/node_modules/universalify /app/node_modules/universalify
+COPY --from=build /app/node_modules/jsonfile /app/node_modules/jsonfile
+
+COPY --from=build /app/server-build /app/server-build
+COPY --from=build /app/build /app/build
+COPY --from=build /app/public /app/public
+COPY --from=build /app/package.json /app/package.json
+COPY --from=build /app/other /app/other
+
+ADD prisma .
+RUN npx prisma generate
+
+ADD . .
+
+RUN npx prisma migrate deploy && \
+    npx prisma db seed
+
+EXPOSE 3000
+CMD ["npm", "run", "start:mocks"]
