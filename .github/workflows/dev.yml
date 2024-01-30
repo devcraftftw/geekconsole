@@ -304,6 +304,15 @@ jobs:
     # needs: [test-unit, test-integration, test-k3d, scan-image, build-final-image]
     needs: [scan-image, build-final-image]
     runs-on: ubuntu-latest
+    env:
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      GITHUB_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+      GITHUB_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      HONEYPOT_SECRET: ${{ secrets.HONEYPOT_SECRET }}
+      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+      INTERNAL_COMMAND_TOKEN: ${{ secrets.INTERNAL_COMMAND_TOKEN }}
 
     permissions:
       packages: read # needed to push docker image to ghcr.io

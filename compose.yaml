@@ -1,14 +1,14 @@
 services:
   geekconsole:
     container_name: geekconsole-dev
-    image: ghcr.io/devcraftftw/geekconsole:latest
+    image: ghcr.io/devcraftftw/geekconsole:develop
     restart: unless-stopped
     pull_policy: always
     environment:
       - RESEND_API_KEY=${RESEND_API_KEY}
-      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
-      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_CLIENT_ID=${GH_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GH_CLIENT_SECRET}
+      - GITHUB_TOKEN=${GH_TOKEN}
       - SENTRY_DSN=${SENTRY_DSN}
       - HONEYPOT_SECRET=${HONEYPOT_SECRET}
       - SESSION_SECRET=${SESSION_SECRET}
