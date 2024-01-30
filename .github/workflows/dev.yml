@@ -306,9 +306,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      GITHUB_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
-      GITHUB_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
-      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+      GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       HONEYPOT_SECRET: ${{ secrets.HONEYPOT_SECRET }}
       SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
@@ -319,7 +319,7 @@ jobs:
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 'Setup TLS and docker remote host'
         uses: blennster/setup-docker-remote-tls@v4
