@@ -319,7 +319,7 @@ jobs:
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: 'Setup TLS and docker remote host'
         uses: blennster/setup-docker-remote-tls@v4
