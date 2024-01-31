@@ -41,7 +41,6 @@ import {
 	Label,
 	RadioGroup,
 	RadioGroupItem,
-	Textarea,
 } from '~/app/shared/ui/index.ts';
 
 type CleanBook = Omit<Book, 'createdAt' | 'updatedAt' | 'ownerId'>;
@@ -57,7 +56,6 @@ const ImageFieldsetSchema = z.object({
 		.refine((file) => {
 			return !file || file.size <= MAX_UPLOAD_SIZE;
 		}, 'File size must be less than 3MB'),
-	altText: z.string().optional(),
 });
 
 type ImageFieldset = z.infer<typeof ImageFieldsetSchema>;
@@ -261,14 +259,11 @@ export default function BookEditor({
 						<div>
 							<div>
 								<Label>Images</Label>
-								<ul className="flex flex-col gap-4">
+								<ul className="flex flex-wrap gap-2">
 									{imageList.map((image, index) => (
-										<li
-											key={image.key}
-											className="relative border-b-2 border-muted-foreground"
-										>
+										<li key={image.key} className="relative">
 											<button
-												className="absolute right-0 top-0 text-foreground-destructive"
+												className="absolute bottom-36 left-24 text-foreground-destructive"
 												{...list.remove(fields.images.name, { index })}
 											>
 												<span aria-hidden>
@@ -298,14 +293,9 @@ export default function BookEditor({
 
 						<ErrorList id={form.errorId} errors={form.errors} />
 
-						<div className="flex items-center space-x-2">
-							<Button form={form.id} variant="destructive" type="reset">
-								Reset
-							</Button>
-							<Button type="submit" disabled={showSpinner}>
-								Submit
-							</Button>
-						</div>
+						<Button type="submit" disabled={showSpinner} className="mt-auto">
+							Submit
+						</Button>
 					</Form>
 				</CardContent>
 			</Card>
@@ -347,14 +337,12 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
 						if (imageHasFile(i)) {
 							return {
 								id: i.id,
-								altText: i.altText,
 								contentType: i.file.type,
 								blob: Buffer.from(await i.file.arrayBuffer()),
 							};
 						} else {
 							return {
 								id: i.id,
-								altText: i.altText,
 							};
 						}
 					}),
@@ -365,7 +353,6 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
 						.filter((i) => !i.id)
 						.map(async (image) => {
 							return {
-								altText: image.altText,
 								contentType: image.file.type,
 								blob: Buffer.from(await image.file.arrayBuffer()),
 							};
@@ -440,7 +427,6 @@ function ImageChooser({
 	const [previewImage, setPreviewImage] = useState<string | null>(
 		fields.id.defaultValue ? getBookImgSrc(fields.id.defaultValue) : null,
 	);
-	const [altText, setAltText] = useState(fields.altText.defaultValue ?? '');
 
 	return (
 		<fieldset
@@ -449,11 +435,11 @@ function ImageChooser({
 			aria-describedby={config.errors?.length ? config.errorId : undefined}
 		>
 			<div className="flex gap-3">
-				<div className="w-32">
-					<div className="relative size-32">
+				<div className="w-28">
+					<div className="relative size-28">
 						<label
 							htmlFor={fields.file.id}
-							className={cn('group absolute h-32 w-32 rounded-lg', {
+							className={cn('group absolute size-28 rounded-lg', {
 								'bg-accent opacity-40 focus-within:opacity-100 hover:opacity-100':
 									!previewImage,
 								'cursor-pointer focus-within:ring-4': !existingImage,
@@ -463,8 +449,8 @@ function ImageChooser({
 								<div className="relative">
 									<img
 										src={previewImage}
-										alt={altText ?? ''}
-										className="size-32 rounded-lg object-cover"
+										alt="Preview"
+										className="size-28 rounded-lg object-cover"
 									/>
 									{existingImage ? null : (
 										<div className="pointer-events-none absolute -right-0.5 -top-0.5 rotate-12 rounded-sm bg-secondary px-2 py-1 text-xs text-secondary-foreground shadow-md">
@@ -473,7 +459,7 @@ function ImageChooser({
 									)}
 								</div>
 							) : (
-								<div className="flex size-32 items-center justify-center rounded-lg border border-muted-foreground text-4xl text-muted-foreground">
+								<div className="flex size-28 items-center justify-center rounded-lg border border-muted-foreground text-4xl text-muted-foreground">
 									<Icon name="plus" />
 								</div>
 							)}
@@ -489,7 +475,7 @@ function ImageChooser({
 
 							<input
 								aria-label="Image"
-								className="absolute left-0 top-0 z-0 size-32 cursor-pointer opacity-0"
+								className="absolute left-0 top-0 z-0 size-28 cursor-pointer opacity-0"
 								onChange={(event) => {
 									const file = event.target.files?.[0];
 
@@ -515,22 +501,6 @@ function ImageChooser({
 						<ErrorList id={fields.file.errorId} errors={fields.file.errors} />
 					</div>
 				</div>
-				<div className="flex-1">
-					<Label htmlFor={fields.altText.id}>Alt Text</Label>
-					<Textarea
-						onChange={(e) => setAltText(e.currentTarget.value)}
-						{...conform.textarea(fields.altText, { ariaAttributes: true })}
-					/>
-					<div className="min-h-[32px] px-4 pb-3 pt-1">
-						<ErrorList
-							id={fields.altText.errorId}
-							errors={fields.altText.errors}
-						/>
-					</div>
-				</div>
-			</div>
-			<div className="min-h-[32px] px-4 pb-3 pt-1">
-				<ErrorList id={config.errorId} errors={config.errors} />
 			</div>
 		</fieldset>
 	);
