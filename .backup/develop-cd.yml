@@ -1,0 +1,54 @@
+---
+name: develop-cd
+
+on:
+  workflow_run:
+    workflows: [develop-ci]
+    types:
+      - completed
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy Final Image
+    # needs: [test-unit, test-integration, test-k3d, scan-image, build-final-image]
+    runs-on: ubuntu-latest
+    env:
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+      GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      HONEYPOT_SECRET: ${{ secrets.HONEYPOT_SECRET }}
+      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+      INTERNAL_COMMAND_TOKEN: ${{ secrets.INTERNAL_COMMAND_TOKEN }}
+
+    permissions:
+      packages: read # needed to push docker image to ghcr.io
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v4
+
+      - name: 'Setup TLS and docker remote host'
+        uses: blennster/setup-docker-remote-tls@v4
+        with:
+          tls_ca: ${{ secrets.TLS_CA }}
+          tls_key: ${{ secrets.TLS_PRIVATE_KEY }}
+          tls_cert: ${{ secrets.TLS_CERT }}
+          tcp_host: ${{ secrets.TLS_HOST_IP }}
+
+      - name: Login to ghcr.io registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'Docker Compose Up'
+        run: docker compose -f ./compose.yaml up -d --force-recreate
+

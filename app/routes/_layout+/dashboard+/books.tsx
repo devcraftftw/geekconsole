@@ -1,19 +1,21 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo';
+import { type LoaderFunctionArgs } from '@remix-run/node';
 import {
-	json,
-	type LoaderFunctionArgs,
 	type MetaFunction,
-} from '@remix-run/node';
-import { Link, Outlet, useLocation } from '@remix-run/react';
+	Link,
+	Outlet,
+	json,
+	useLocation,
+} from '@remix-run/react';
 
 import { requireUserId } from '~/app/core/server/index.ts';
-import { type BreadcrumbHandle } from '~/app/shared/schemas/index.ts';
+import { type BreadcrumbHandle } from '~/app/shared/schemas';
 import { Button } from '~/app/shared/ui/index.ts';
 
 export const meta: MetaFunction = () => {
 	return [
-		{ title: 'Books collection | GeekConsole' },
-		{ name: 'description', content: 'Your precious books collection' },
+		{ title: 'Books | GeekConsole' },
+		{ name: 'description', content: 'Your books collection' },
 	];
 };
 
@@ -28,8 +30,6 @@ export default function Books() {
 	return (
 		<section className="flex w-full flex-col gap-4">
 			<div className="flex items-center gap-2">
-				<h2>Check out the coolest book collection!</h2>
-
 				<div>
 					{pathname !== '/dashboard/books/new' && (
 						<Button asChild variant="link">
@@ -49,7 +49,7 @@ export default function Books() {
 				</div>
 			</div>
 
-			<div className="w-full">
+			<div className="size-full">
 				<Outlet />
 			</div>
 		</section>
