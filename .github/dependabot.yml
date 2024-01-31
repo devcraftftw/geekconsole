@@ -5,11 +5,15 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "[gha ] "
 
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "[npm ] "
 
   - package-ecosystem: "docker"
     directory: "/"
