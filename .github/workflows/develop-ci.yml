@@ -1,5 +1,5 @@
 ---
-name: ci-cd-workflow for dev branch
+name: develop-ci
 
 on:
   push:
@@ -7,6 +7,10 @@ on:
       - develop
   pull_request:
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
 
 jobs:
 # FIRST JOB #######################################################################   
@@ -249,7 +253,6 @@ jobs:
           flavor: |
             latest=false
           tags: |
-            type=raw,value=99
             type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
             type=ref,event=pr
             type=ref,event=branch
