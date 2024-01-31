@@ -1,5 +1,5 @@
 ---
-name: Docker Build - Full
+name: Devops
 # complete workflow with intelligent, automated tags and labels
 # images stored in ghcr.io
 # GitHub cache enabled for layers

@@ -1,5 +1,5 @@
 ---
-name: develop-ci
+name: Develop
 
 on:
   push:
