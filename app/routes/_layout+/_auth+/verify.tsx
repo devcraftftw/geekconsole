@@ -1,5 +1,10 @@
-import { type Submission, conform, useForm } from '@conform-to/react';
-import { getFieldsetConstraint, parse } from '@conform-to/zod';
+import {
+	useForm,
+	type Submission,
+	getFormProps,
+	getInputProps,
+} from '@conform-to/react';
+import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { json, type ActionFunctionArgs } from '@remix-run/node';
 import { Form, useActionData, useSearchParams } from '@remix-run/react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
@@ -51,7 +56,11 @@ const VerifySchema = z.object({
 
 export type VerifyFunctionArgs = {
 	request: Request;
-	submission: Submission<z.infer<typeof VerifySchema>>;
+	submission: Submission<
+		z.input<typeof VerifySchema>,
+		string[],
+		z.output<typeof VerifySchema>
+	>;
 	body: FormData | URLSearchParams;
 };
 
@@ -178,7 +187,7 @@ async function validateRequest(
 	request: Request,
 	body: URLSearchParams | FormData,
 ) {
-	const submission = await parse(body, {
+	const submission = await parseWithZod(body, {
 		schema: VerifySchema.superRefine(async (data, ctx) => {
 			const codeIsValid = await isCodeValid({
 				code: data[codeQueryParam],
@@ -199,12 +208,13 @@ async function validateRequest(
 		async: true,
 	});
 
-	if (submission.intent !== 'submit') {
-		return json({ status: 'idle', submission } as const);
-	}
-
-	if (!submission.value) {
-		return json({ status: 'error', submission } as const, { status: 400 });
+	if (submission.status !== 'success') {
+		return json(
+			{ result: submission.reply() },
+			{
+				status: submission.status === 'error' ? 400 : 200,
+			},
+		);
 	}
 
 	// this code path could be part of a loader (GET request), so we need to make
@@ -251,10 +261,10 @@ export default function VerifyRoute() {
 	const isPending = useIsPending();
 	const actionData = useActionData<typeof action>();
 
-	const parsedType = VerificationTypeSchema.safeParse(
+	const parseWithZoddType = VerificationTypeSchema.safeParse(
 		searchParams.get(typeQueryParam),
 	);
-	const type = parsedType.success ? parsedType.data : null;
+	const type = parseWithZoddType.success ? parseWithZoddType.data : null;
 
 	const checkEmail = (
 		<>
@@ -281,16 +291,16 @@ export default function VerifyRoute() {
 
 	const [form, fields] = useForm({
 		id: 'verify-form',
-		constraint: getFieldsetConstraint(VerifySchema),
-		lastSubmission: actionData?.submission,
+		constraint: getZodConstraint(VerifySchema),
+		lastResult: actionData?.result,
 		onValidate({ formData }) {
-			return parse(formData, { schema: VerifySchema });
+			return parseWithZod(formData, { schema: VerifySchema });
 		},
 		defaultValue: {
-			code: searchParams.get(codeQueryParam) ?? '',
-			type,
-			target: searchParams.get(targetQueryParam) ?? '',
-			redirectTo: searchParams.get(redirectToQueryParam) ?? '',
+			code: searchParams.get(codeQueryParam),
+			type: type,
+			target: searchParams.get(targetQueryParam),
+			redirectTo: searchParams.get(redirectToQueryParam),
 		},
 	});
 
@@ -308,7 +318,7 @@ export default function VerifyRoute() {
 				</div>
 
 				<div className="flex w-full gap-2">
-					<Form method="POST" {...form.props} className="flex-1">
+					<Form method="POST" {...getFormProps(form)} className="flex-1">
 						<AuthenticityTokenInput />
 						<HoneypotInputs />
 
@@ -318,27 +328,27 @@ export default function VerifyRoute() {
 								children: 'Code',
 							}}
 							inputProps={{
-								...conform.input(fields[codeQueryParam]),
+								...getInputProps(fields[codeQueryParam], { type: 'text' }),
 								autoComplete: 'one-time-code',
 							}}
 							errors={fields[codeQueryParam].errors}
 						/>
 
 						<input
-							{...conform.input(fields[typeQueryParam], { type: 'hidden' })}
+							{...getInputProps(fields[typeQueryParam], { type: 'hidden' })}
 						/>
 						<input
-							{...conform.input(fields[targetQueryParam], { type: 'hidden' })}
+							{...getInputProps(fields[targetQueryParam], { type: 'hidden' })}
 						/>
 						<input
-							{...conform.input(fields[redirectToQueryParam], {
+							{...getInputProps(fields[redirectToQueryParam], {
 								type: 'hidden',
 							})}
 						/>
 
 						<StatusButton
 							className="w-full"
-							status={isPending ? 'pending' : actionData?.status ?? 'idle'}
+							status={isPending ? 'pending' : form.status ?? 'idle'}
 							type="submit"
 							disabled={isPending}
 						>

@@ -1,12 +1,13 @@
 import {
-	type FieldConfig,
-	conform,
-	useFieldset,
+	type FieldMetadata,
 	useForm,
-	list,
-	useFieldList,
+	getInputProps,
+	getFormProps,
+	getFieldsetProps,
+	FormProvider,
+	useInputControl,
 } from '@conform-to/react';
-import { getFieldsetConstraint, parse } from '@conform-to/zod';
+import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { createId as cuid } from '@paralleldrive/cuid2';
 import { type Book, type BookImage } from '@prisma/client';
 import {
@@ -18,7 +19,7 @@ import {
 	unstable_createMemoryUploadHandler as createMemoryUploadHandler,
 } from '@remix-run/node';
 import { useActionData, Form } from '@remix-run/react';
-import { useRef, useState } from 'react';
+import { type ElementRef, useRef, useState } from 'react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { useSpinDelay } from 'spin-delay';
 import { z } from 'zod';
@@ -72,7 +73,7 @@ function imageHasFile(
 	return Boolean(image.file?.size && image.file?.size > 0);
 }
 
-const NewBookFormSchema = z.object({
+const BookFormSchema = z.object({
 	id: z.string().optional(),
 	title: z
 		.string()
@@ -85,223 +86,9 @@ const NewBookFormSchema = z.object({
 	year: z.number().positive(),
 	images: z.array(ImageFieldsetSchema).max(5).optional(),
 	readingStatus: z.string(),
-	description: z
-		.string()
-		.min(10, { message: 'Please, provide at least some description' }),
+	description: z.string().optional(),
 	comment: z.string().optional(),
 });
-
-export default function BookEditor({
-	book,
-}: {
-	book?: SerializeFrom<
-		CleanBook & {
-			images: Array<Pick<BookImage, 'id' | 'altText'>>;
-		}
-	>;
-}) {
-	const actionData = useActionData<typeof action>();
-
-	const isSubmitting = useSubmitting();
-	const showSpinner = useSpinDelay(isSubmitting);
-
-	const [form, fields] = useForm({
-		id: 'bookEditor',
-		constraint: getFieldsetConstraint(NewBookFormSchema),
-		lastSubmission: actionData?.submission,
-		shouldValidate: 'onBlur',
-		shouldRevalidate: 'onBlur',
-		onValidate({ formData }) {
-			return parse(formData, {
-				schema: NewBookFormSchema,
-			});
-		},
-		defaultValue: {
-			title: book?.title ?? '',
-			author: book?.author ?? '',
-			year: book?.year ?? new Date().getFullYear(),
-			images: book?.images ?? [{}],
-			readingStatus: book?.readingStatus ?? '',
-			description: book?.description ?? '',
-			comment: book?.comment ?? '',
-		},
-	});
-
-	const imageList = useFieldList(form.ref, fields.images);
-
-	return (
-		<div>
-			<Card className="pt-6">
-				<CardContent>
-					<Form
-						method="post"
-						encType="multipart/form-data"
-						className="grid w-full grid-cols-2 gap-4"
-						{...form.props}
-					>
-						<AuthenticityTokenInput />
-						{/*
-                            This hidden submit button is here to ensure that when the user hits
-                            "enter" on an input field, the primary form function is submitted
-                            rather than the first button in the form (which is delete/add image).
-				        */}
-						<button type="submit" className="hidden" />
-
-						{book ? <input type="hidden" name="id" value={book.id} /> : null}
-
-						{/* TITLE */}
-						<div>
-							<Label htmlFor={fields.title.id}>Title</Label>
-							<Input
-								autoFocus
-								placeholder="Romeo & Juliet"
-								{...conform.input(fields.title, { type: 'string' })}
-							/>
-							<div className="min-h-[32px] px-4 pb-3 pt-1">
-								<ErrorList
-									id={fields.title.errorId}
-									errors={fields.title.errors}
-								/>
-							</div>
-						</div>
-
-						{/* AUTHOR */}
-						<div>
-							<Label htmlFor={fields.author.id}>Author</Label>
-							<Input
-								placeholder="William Shakespear"
-								{...conform.input(fields.author, { type: 'string' })}
-							/>
-							<div className="min-h-[32px] px-4 pb-3 pt-1">
-								<ErrorList
-									id={fields.author.errorId}
-									errors={fields.author.errors}
-								/>
-							</div>
-						</div>
-
-						{/* YEAR */}
-						<div>
-							<Label htmlFor={fields.year.id}>Year</Label>
-							<Input
-								placeholder="1597"
-								{...conform.input(fields.year, { type: 'number' })}
-							/>
-							<div className="min-h-[32px] px-4 pb-3 pt-1">
-								<ErrorList
-									id={fields.year.errorId}
-									errors={fields.year.errors}
-								/>
-							</div>
-						</div>
-
-						{/* DESCRIPTION */}
-						<div>
-							<Label htmlFor={fields.description.id}>Description</Label>
-							<Input
-								placeholder="Book description"
-								{...conform.input(fields.description)}
-							/>
-							<div className="min-h-[32px] px-4 pb-3 pt-1">
-								<ErrorList
-									id={fields.description.errorId}
-									errors={fields.description.errors}
-								/>
-							</div>
-						</div>
-
-						{/* READING STATUS */}
-						<div>
-							<Label htmlFor={fields.readingStatus.id}>Reading status</Label>
-							<RadioGroup
-								className="flex space-y-1"
-								{...conform.input(fields.readingStatus)}
-							>
-								{conform
-									.collection(fields.readingStatus, {
-										type: 'radio',
-										options: READING_STATUSES,
-									})
-									.map((props) => (
-										<div
-											key={props.value}
-											className="flex items-center space-x-3 space-y-0"
-										>
-											<RadioGroupItem {...props} type="button" />
-											<Label>{props.value}</Label>
-										</div>
-									))}
-							</RadioGroup>
-							<div className="min-h-[32px] px-4 pb-3 pt-1">
-								<ErrorList
-									id={fields.readingStatus.errorId}
-									errors={fields.readingStatus.errors}
-								/>
-							</div>
-						</div>
-
-						{/* Comments */}
-						<div>
-							<Label htmlFor={fields.comment.id}>Your comments</Label>
-							<Input
-								placeholder="Share your thoughts about this book or leave some comments for your future reference"
-								{...conform.input(fields.comment)}
-							/>
-							<div className="min-h-[32px] px-4 pb-3 pt-1">
-								<ErrorList
-									id={fields.comment.errorId}
-									errors={fields.comment.errors}
-								/>
-							</div>
-						</div>
-
-						{/* IMAGES */}
-						<div>
-							<div>
-								<Label>Images</Label>
-								<ul className="flex flex-wrap gap-2">
-									{imageList.map((image, index) => (
-										<li key={image.key} className="relative">
-											<button
-												className="absolute bottom-36 left-24 text-foreground-destructive"
-												{...list.remove(fields.images.name, { index })}
-											>
-												<span aria-hidden>
-													<Icon name="cross-1" />
-												</span>
-												<span className="sr-only">
-													Remove image {index + 1}
-												</span>
-											</button>
-											<ImageChooser config={image} />
-										</li>
-									))}
-								</ul>
-							</div>
-
-							{/* ADD IMAGE */}
-							<Button
-								className="mt-3"
-								{...list.insert(fields.images.name, { defaultValue: {} })}
-							>
-								<span aria-hidden>
-									<Icon name="plus">Image</Icon>
-								</span>{' '}
-								<span className="sr-only">Add image</span>
-							</Button>
-						</div>
-
-						<ErrorList id={form.errorId} errors={form.errors} />
-
-						<Button type="submit" disabled={showSpinner} className="mt-auto">
-							Submit
-						</Button>
-					</Form>
-				</CardContent>
-			</Card>
-		</div>
-	);
-}
 
 export const action = async ({ request }: LoaderFunctionArgs) => {
 	const userId = await requireUserId(request);
@@ -314,8 +101,8 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
 
 	await validateCSRF(formData, request.headers);
 
-	const submission = await parse(formData, {
-		schema: NewBookFormSchema.superRefine(async (data, ctx) => {
+	const submission = await parseWithZod(formData, {
+		schema: BookFormSchema.superRefine(async (data, ctx) => {
 			if (!data.id) return;
 
 			const book = await prisma.book.findUnique({
@@ -363,8 +150,14 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
 		async: true,
 	});
 
-	if (submission.intent !== 'submit') return json({ submission } as const);
-	if (!submission.value) return json({ submission } as const, { status: 400 });
+	if (submission.status !== 'success') {
+		return json(
+			{ result: submission.reply() },
+			{
+				status: submission.status === 'error' ? 400 : 200,
+			},
+		);
+	}
 
 	const {
 		id: bookId,
@@ -416,24 +209,240 @@ export const loader = async (_: LoaderFunctionArgs) => {
 	return json({});
 };
 
-function ImageChooser({
-	config,
+export default function BookEditor({
+	book,
 }: {
-	config: FieldConfig<z.infer<typeof ImageFieldsetSchema>>;
+	book?: SerializeFrom<
+		CleanBook & {
+			images: Array<Pick<BookImage, 'id' | 'altText'>>;
+		}
+	>;
 }) {
-	const ref = useRef<HTMLFieldSetElement>(null);
-	const fields = useFieldset(ref, config);
-	const existingImage = Boolean(fields.id.defaultValue);
+	const actionData = useActionData<typeof action>();
+
+	const isSubmitting = useSubmitting();
+	const showSpinner = useSpinDelay(isSubmitting);
+
+	const [form, fields] = useForm({
+		id: 'bookEditor',
+		constraint: getZodConstraint(BookFormSchema),
+		lastResult: actionData?.result,
+		shouldValidate: 'onBlur',
+		shouldRevalidate: 'onBlur',
+		onValidate({ formData }) {
+			return parseWithZod(formData, {
+				schema: BookFormSchema,
+			});
+		},
+		defaultValue: {
+			...book,
+			images: book?.images ?? [{}],
+		},
+	});
+
+	const imageList = fields.images.getFieldList();
+
+	return (
+		<div>
+			<Card className="pt-6">
+				<CardContent>
+					<FormProvider context={form.context}>
+						<Form
+							method="post"
+							encType="multipart/form-data"
+							className="grid w-full grid-cols-2 gap-4"
+							{...getFormProps(form)}
+						>
+							<AuthenticityTokenInput />
+							{/*
+                            This hidden submit button is here to ensure that when the user hits
+                            "enter" on an input field, the primary form function is submitted
+                            rather than the first button in the form (which is delete/add image).
+				        */}
+							<button type="submit" className="hidden" />
+
+							{book ? <input type="hidden" name="id" value={book.id} /> : null}
+
+							{/* TITLE */}
+							<div>
+								<Label htmlFor={fields.title.id}>Title</Label>
+								<Input
+									autoFocus
+									placeholder="Romeo & Juliet"
+									{...getInputProps(fields.title, { type: 'text' })}
+								/>
+								<div className="min-h-[32px] px-4 pb-3 pt-1">
+									<ErrorList
+										id={fields.title.errorId}
+										errors={fields.title.errors}
+									/>
+								</div>
+							</div>
+
+							{/* AUTHOR */}
+							<div>
+								<Label htmlFor={fields.author.id}>Author</Label>
+								<Input
+									placeholder="William Shakespear"
+									{...getInputProps(fields.author, { type: 'text' })}
+								/>
+								<div className="min-h-[32px] px-4 pb-3 pt-1">
+									<ErrorList
+										id={fields.author.errorId}
+										errors={fields.author.errors}
+									/>
+								</div>
+							</div>
+
+							{/* YEAR */}
+							<div>
+								<Label htmlFor={fields.year.id}>Year</Label>
+								<Input
+									placeholder="1597"
+									{...getInputProps(fields.year, { type: 'number' })}
+								/>
+								<div className="min-h-[32px] px-4 pb-3 pt-1">
+									<ErrorList
+										id={fields.year.errorId}
+										errors={fields.year.errors}
+									/>
+								</div>
+							</div>
+
+							{/* DESCRIPTION */}
+							<div>
+								<Label htmlFor={fields.description.id}>Description</Label>
+								<Input
+									placeholder="Book description"
+									{...getInputProps(fields.description, { type: 'text' })}
+								/>
+								<div className="min-h-[32px] px-4 pb-3 pt-1">
+									<ErrorList
+										id={fields.description.errorId}
+										errors={fields.description.errors}
+									/>
+								</div>
+							</div>
+
+							{/* READING STATUS */}
+							<ReadingStatusRadioGroup meta={fields.readingStatus} />
+
+							{/* Comments */}
+							<div>
+								<Label htmlFor={fields.comment.id}>Your comments</Label>
+								<Input
+									placeholder="Share your thoughts about this book or leave some comments for your future reference"
+									{...getInputProps(fields.comment, { type: 'text' })}
+								/>
+								<div className="min-h-[32px] px-4 pb-3 pt-1">
+									<ErrorList
+										id={fields.comment.errorId}
+										errors={fields.comment.errors}
+									/>
+								</div>
+							</div>
+
+							{/* IMAGES */}
+							<div>
+								<div>
+									<Label>Images</Label>
+									<ul className="flex flex-wrap gap-2">
+										{imageList.map((image, index) => (
+											<li key={image.key} className="relative">
+												<button
+													className="absolute bottom-36 left-24 text-foreground-destructive"
+													{...form.remove.getButtonProps({
+														name: fields.images.name,
+														index,
+													})}
+												>
+													<span aria-hidden>
+														<Icon name="cross-1" />
+													</span>
+													<span className="sr-only">
+														Remove image {index + 1}
+													</span>
+												</button>
+												<ImageChooser meta={image} />
+											</li>
+										))}
+									</ul>
+								</div>
+
+								{/* ADD IMAGE */}
+								<Button
+									className="mt-3"
+									{...form.insert.getButtonProps({ name: fields.images.name })}
+								>
+									<span aria-hidden>
+										<Icon name="plus">Image</Icon>
+									</span>{' '}
+									<span className="sr-only">Add image</span>
+								</Button>
+							</div>
+
+							<ErrorList id={form.errorId} errors={form.errors} />
+
+							<Button type="submit" disabled={showSpinner} className="mt-auto">
+								Submit
+							</Button>
+						</Form>
+					</FormProvider>
+				</CardContent>
+			</Card>
+		</div>
+	);
+}
+
+const ReadingStatusRadioGroup = ({ meta }: { meta: FieldMetadata<string> }) => {
+	const radioGroupRef = useRef<ElementRef<typeof RadioGroup>>(null);
+	const control = useInputControl(meta);
+
+	return (
+		<div>
+			<Label htmlFor={meta.id}>Reading status</Label>
+			<input
+				name={meta.name}
+				defaultValue={meta.initialValue}
+				tabIndex={-1}
+				className="sr-only"
+				onFocus={() => {
+					radioGroupRef.current?.focus();
+				}}
+			/>
+			<RadioGroup
+				value={control.value}
+				onBlur={() => control.blur()}
+				ref={radioGroupRef}
+				defaultValue={meta.initialValue}
+				onValueChange={(value) => {
+					control.change(value);
+				}}
+				className="flex space-y-1"
+			>
+				{READING_STATUSES.map((status) => (
+					<div key={status} className="flex items-center space-x-3 space-y-0">
+						<RadioGroupItem value={status} type="button" />
+						<Label>{status}</Label>
+					</div>
+				))}
+			</RadioGroup>
+			<div className="min-h-[32px] px-4 pb-3 pt-1">
+				<ErrorList id={meta.errorId} errors={meta.errors} />
+			</div>
+		</div>
+	);
+};
+
+function ImageChooser({ meta }: { meta: FieldMetadata<ImageFieldset> }) {
+	const fields = meta.getFieldset();
+	const existingImage = Boolean(fields.id.initialValue);
 	const [previewImage, setPreviewImage] = useState<string | null>(
-		fields.id.defaultValue ? getBookImgSrc(fields.id.defaultValue) : null,
+		fields.id.initialValue ? getBookImgSrc(fields.id.initialValue) : null,
 	);
 
 	return (
-		<fieldset
-			ref={ref}
-			aria-invalid={Boolean(config.errors?.length) || undefined}
-			aria-describedby={config.errors?.length ? config.errorId : undefined}
-		>
+		<fieldset {...getFieldsetProps(meta)}>
 			<div className="flex gap-3">
 				<div className="w-28">
 					<div className="relative size-28">
@@ -466,9 +475,8 @@ function ImageChooser({
 
 							{existingImage ? (
 								<input
-									{...conform.input(fields.id, {
+									{...getInputProps(fields.id, {
 										type: 'hidden',
-										ariaAttributes: true,
 									})}
 								/>
 							) : null}
@@ -490,9 +498,8 @@ function ImageChooser({
 									}
 								}}
 								accept="image/*"
-								{...conform.input(fields.file, {
+								{...getInputProps(fields.file, {
 									type: 'file',
-									ariaAttributes: true,
 								})}
 							/>
 						</label>

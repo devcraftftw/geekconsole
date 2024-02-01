@@ -1,4 +1,4 @@
-import { useForm } from '@conform-to/react';
+import { getFormProps, useForm } from '@conform-to/react';
 import { useFetcher } from '@remix-run/react';
 import { type Theme } from '~/app/core/server/index.ts';
 import { type action as rootAction } from '~/app/root.tsx';
@@ -14,7 +14,7 @@ export function ThemeSwitcher({
 
 	const [form] = useForm({
 		id: 'theme-switch',
-		lastSubmission: fetcher.data?.submission,
+		lastResult: fetcher.data?.result,
 	});
 
 	const optimisticMode = useOptimisticThemeMode();
@@ -41,12 +41,12 @@ export function ThemeSwitcher({
 	};
 
 	return (
-		<fetcher.Form method="POST" {...form.props}>
+		<fetcher.Form method="POST" {...getFormProps(form)}>
 			<input type="hidden" name="theme" value={nextMode} />
 			<div className="flex gap-2">
 				<button
 					type="submit"
-					className="flex h-8 w-8 cursor-pointer items-center justify-center"
+					className="flex size-8 cursor-pointer items-center justify-center"
 				>
 					{modeLabel[mode]}
 				</button>

@@ -1,5 +1,5 @@
-import { conform, useForm } from '@conform-to/react';
-import { getFieldsetConstraint, parse } from '@conform-to/zod';
+import { getFormProps, getInputProps, useForm } from '@conform-to/react';
+import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import {
 	json,
 	redirect,
@@ -30,11 +30,18 @@ import { twoFAVerificationType } from './profile.two-factor.tsx';
 
 export const handle = {
 	breadcrumb: <Icon name="check">Verify</Icon>,
+	getSitemapEntries: () => null,
 };
 
+const CancelSchema = z.object({ intent: z.literal('cancel') });
 const VerifySchema = z.object({
+	intent: z.literal('verify'),
 	code: z.string().min(6).max(6),
 });
+const ActionSchema = z.discriminatedUnion('intent', [
+	CancelSchema,
+	VerifySchema,
+]);
 
 export const twoFAVerifyVerificationType = '2fa-verify';
 
@@ -83,17 +90,11 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	await validateCSRF(formData, request.headers);
 
-	if (formData.get('intent') === 'cancel') {
-		await prisma.verification.deleteMany({
-			where: { type: twoFAVerifyVerificationType, target: userId },
-		});
-
-		return redirect('/settings/profile/two-factor');
-	}
-
-	const submission = await parse(formData, {
+	const submission = await parseWithZod(formData, {
 		schema: () =>
-			VerifySchema.superRefine(async (data, ctx) => {
+			ActionSchema.superRefine(async (data, ctx) => {
+				if (data.intent === 'cancel') return null;
+
 				const codeIsValid = await isCodeValid({
 					code: data.code,
 					type: twoFAVerifyVerificationType,
@@ -114,26 +115,38 @@ export async function action({ request }: ActionFunctionArgs) {
 		async: true,
 	});
 
-	if (submission.intent !== 'submit') {
-		return json({ status: 'idle', submission } as const);
+	if (submission.status !== 'success') {
+		return json(
+			{ result: submission.reply() },
+			{
+				status: submission.status === 'error' ? 400 : 200,
+			},
+		);
 	}
 
-	if (!submission.value) {
-		return json({ status: 'error', submission } as const, { status: 400 });
+	switch (submission.value.intent) {
+		case 'cancel': {
+			await prisma.verification.deleteMany({
+				where: { type: twoFAVerifyVerificationType, target: userId },
+			});
+
+			return redirect('/settings/profile/two-factor');
+		}
+
+		case 'verify': {
+			await prisma.verification.update({
+				where: {
+					target_type: { type: twoFAVerifyVerificationType, target: userId },
+				},
+				data: { type: twoFAVerificationType },
+			});
+			return redirectWithToast('/settings/profile/two-factor', {
+				type: 'success',
+				title: 'Enabled',
+				description: 'Two-factor authentication has been enabled.',
+			});
+		}
 	}
-
-	await prisma.verification.update({
-		where: {
-			target_type: { type: twoFAVerifyVerificationType, target: userId },
-		},
-		data: { type: twoFAVerificationType, expiresAt: null },
-	});
-
-	throw await redirectWithToast('/settings/profile/two-factor', {
-		type: 'success',
-		title: 'Enabled',
-		description: 'Two-factor authentication has been enabled.',
-	});
 }
 
 export default function TwoFactorRoute() {
@@ -146,17 +159,19 @@ export default function TwoFactorRoute() {
 
 	const [form, fields] = useForm({
 		id: 'verify-form',
-		constraint: getFieldsetConstraint(VerifySchema),
-		lastSubmission: actionData?.submission,
+		constraint: getZodConstraint(VerifySchema),
+		lastResult: actionData?.result,
 		onValidate({ formData }) {
-			return parse(formData, { schema: VerifySchema });
+			return parseWithZod(formData, { schema: VerifySchema });
 		},
 	});
+
+	const lastSubmissionIntent = fields.intent.value;
 
 	return (
 		<div>
 			<div className="flex flex-col items-center gap-4">
-				<img alt="qr code" src={data.qrCode} className="h-56 w-56" />
+				<img alt="qr code" src={data.qrCode} className="size-56" />
 				<p>Scan this QR code with your authenticator app.</p>
 				<p className="text-sm">
 					If you cannot scan the QR code, you can manually add this account to
@@ -178,7 +193,7 @@ export default function TwoFactorRoute() {
 					lose access to your account.
 				</p>
 				<div className="flex w-full max-w-xs flex-col justify-center gap-4">
-					<Form method="POST" {...form.props} className="flex-1">
+					<Form method="POST" {...getFormProps(form)} className="flex-1">
 						<AuthenticityTokenInput />
 
 						<Field
@@ -187,7 +202,7 @@ export default function TwoFactorRoute() {
 								children: 'Code',
 							}}
 							inputProps={{
-								...conform.input(fields.code),
+								...getInputProps(fields.code, { type: 'text' }),
 								autoFocus: true,
 								autoComplete: 'one-time-code',
 							}}
@@ -199,7 +214,9 @@ export default function TwoFactorRoute() {
 								status={
 									pendingIntent === 'verify'
 										? 'pending'
-										: actionData?.status ?? 'idle'
+										: lastSubmissionIntent === 'verify'
+											? form.status ?? 'idle'
+											: 'idle'
 								}
 								type="submit"
 								name="intent"
@@ -211,7 +228,13 @@ export default function TwoFactorRoute() {
 							<StatusButton
 								className="w-full"
 								variant="secondary"
-								status={pendingIntent === 'cancel' ? 'pending' : 'idle'}
+								status={
+									pendingIntent === 'cancel'
+										? 'pending'
+										: lastSubmissionIntent === 'cancel'
+											? form.status ?? 'idle'
+											: 'idle'
+								}
 								type="submit"
 								name="intent"
 								value="cancel"
