@@ -1,0 +1,11 @@
+name: Call Trivy
+on:
+ push:
+   branches: [main]
+ pull_request:
+jobs:
+ scan:
+   name: Scan
+   uses: devcraftftw/actions/.github/workflows/reusable-trivy.yml@devops
+   with:
+    image: 'ghcr.io/devcraftftw/geekconsole:develop'
