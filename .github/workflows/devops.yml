@@ -7,9 +7,9 @@ name: Devops
 
 on:
   push:
-    branches:
-      - devops
-  pull_request: {}
+  #   branches:
+  #     - devops
+  # pull_request: {}
   workflow_dispatch:
 
 # cancel any previously-started, yet still active runs of this workflow on the same branch
