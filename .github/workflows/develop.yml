@@ -306,7 +306,7 @@ jobs:
   deploy:
     name: Deploy Final Image
     # needs: [test-unit, test-integration, test-k3d, scan-image, build-final-image]
-    # needs: [scan-image, build-final-image]
+    needs: [build-final-image]
     runs-on: ubuntu-latest
     env:
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
