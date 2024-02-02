@@ -45,7 +45,7 @@ RUN npm run build
 FROM base as gc
 
 ENV INTERNAL_PORT="8080"
-ENV PORT="8081"
+ENV PORT="3000"
 ENV NODE_ENV="production"
 ENV LITEFS_DIR="/litefs/data"
 ENV DATABASE_URL="file:./data.db"
