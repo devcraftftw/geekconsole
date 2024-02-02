@@ -44,6 +44,9 @@ RUN npm run build
 # Finally, build the production image with minimal footprint
 FROM base as gc
 
+ENV INTERNAL_PORT="8080"
+ENV PORT="8081"
+ENV NODE_ENV="production"
 ENV LITEFS_DIR="/litefs/data"
 ENV DATABASE_URL="file:./data.db"
 ENV DATABASE_PATH="./prisma/data.db"
@@ -53,15 +56,13 @@ ENV GITHUB_CLIENT_ID=$GITHUB_CLIENT_ID
 ENV GITHUB_CLIENT_SECRET=$GITHUB_CLIENT_SECRET
 ENV GITHUB_TOKEN=$GITHUB_TOKEN
 
-ARG GITHUB_CLIENT_ID
-ARG GITHUB_CLIENT_SECRET
-
 # add shortcut for connecting to database CLI
 RUN echo "#!/bin/sh\nset -x\nsqlite3 \$DATABASE_URL" > /usr/local/bin/database-cli && chmod +x /usr/local/bin/database-cli
 
 WORKDIR /app
 
 COPY --from=production-deps /app/node_modules /app/node_modules
+# COPY --from=build /app/node_modules /app/node_modules
 
 COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
 COPY --from=build /app/node_modules/@faker-js /app/node_modules/@faker-js
@@ -98,6 +99,10 @@ ADD . .
 
 RUN npx prisma migrate deploy && \
     npx prisma db seed
+
+COPY --from=flyio/litefs:0.5.8 /usr/local/bin/litefs /usr/local/bin/litefs
+COPY other/litefs.yml /etc/litefs.yml
+RUN mkdir -p /data ${LITEFS_DIR}
 
 EXPOSE 3000
 CMD ["npm", "run", "start:mocks"]
