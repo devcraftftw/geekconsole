@@ -317,7 +317,7 @@ jobs:
       HONEYPOT_SECRET: ${{ secrets.HONEYPOT_SECRET }}
       SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
       INTERNAL_COMMAND_TOKEN: ${{ secrets.INTERNAL_COMMAND_TOKEN }}
-      IMAGE_NAME: ${{ github.run_id }}
+      IMAGE_NAME: ghcr.io/devcraftftw/geekconsole:${{ github.run_id }}
 
     permissions:
       packages: read # needed to push docker image to ghcr.io
