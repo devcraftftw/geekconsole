@@ -250,21 +250,22 @@ jobs:
         with:
           # images: devcraftftw/geekconsole,ghcr.io/devcraftftw/geekconsole
           images: ghcr.io/devcraftftw/geekconsole
-          flavor: |
-            latest=false
-          tags: |
-            type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-            type=ref,event=pr
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            ghcr.io/devcraftftw/geekconsole:${{ github.run_id }}
+          # flavor: |
+          #   latest=false
+          # tags: |
+          #   type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+          #   type=ref,event=pr
+          #   type=ref,event=branch
+          #   type=semver,pattern={{version}}
+          #   ghcr.io/devcraftftw/geekconsole:${{ github.run_id }}
       
       - name: Docker Build and Push to GHCR and Docker Hub
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
+          # tags: ${{ steps.docker_meta.outputs.tags }}
+          tags: ghcr.io/devcraftftw/geekconsole:${{ github.run_id }}
+          # labels: ${{ steps.docker_meta.outputs.labels }}
           file: "./Dockerfile_dev"
           cache-from: type=gha
           cache-to: type=gha,mode=max
