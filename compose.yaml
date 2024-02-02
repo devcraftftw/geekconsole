@@ -1,7 +1,7 @@
 services:
   geekconsole:
     container_name: geekconsole-dev
-    image: ghcr.io/devcraftftw/geekconsole:develop
+    image: ghcr.io/devcraftftw/geekconsole:latest
     restart: unless-stopped
     pull_policy: always
     environment:
