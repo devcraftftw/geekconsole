@@ -30,7 +30,7 @@
     "test:e2e:install": "npx playwright install --with-deps chromium",
     "typecheck": "tsc",
     "validate": "run-p \"test -- --run\" lint typecheck test:e2e:run",
-    "prepare": "husky"
+    "prepare": "if [ -d .git ] || git rev-parse --is-inside-work-tree > /dev/null 2>&1; then husky install; fi"
   },
   "dependencies": {
     "@conform-to/react": "^1.0.0",
