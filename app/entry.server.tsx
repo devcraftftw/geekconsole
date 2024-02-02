@@ -17,7 +17,11 @@ const ABORT_DELAY = 5000;
 init();
 global.ENV = getEnv();
 
-if (ENV.MODE === 'production' && ENV.SENTRY_DSN) {
+if (
+	ENV.MODE === 'production' &&
+	process.env.MOCKS === 'false' &&
+	ENV.SENTRY_DSN
+) {
 	import('./core/server/monitoring/monitoring.server.ts').then(({ init }) =>
 		init(),
 	);
