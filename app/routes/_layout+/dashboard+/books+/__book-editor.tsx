@@ -6,6 +6,7 @@ import {
 	getFieldsetProps,
 	FormProvider,
 	useInputControl,
+	getCollectionProps,
 } from '@conform-to/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { createId as cuid } from '@paralleldrive/cuid2';
@@ -395,8 +396,8 @@ export default function BookEditor({
 }
 
 const ReadingStatusRadioGroup = ({ meta }: { meta: FieldMetadata<string> }) => {
-	const radioGroupRef = useRef<ElementRef<typeof RadioGroup>>(null);
 	const control = useInputControl(meta);
+	const radioGroupRef = useRef<ElementRef<typeof RadioGroup>>(null);
 
 	return (
 		<div>
@@ -411,19 +412,24 @@ const ReadingStatusRadioGroup = ({ meta }: { meta: FieldMetadata<string> }) => {
 				}}
 			/>
 			<RadioGroup
+				id={meta.id}
 				value={control.value}
-				onBlur={() => control.blur()}
-				ref={radioGroupRef}
 				defaultValue={meta.initialValue}
-				onValueChange={(value) => {
-					control.change(value);
-				}}
+				onValueChange={control.change}
+				ref={radioGroupRef}
+				onBlur={control.blur}
 				className="flex space-y-1"
 			>
-				{READING_STATUSES.map((status) => (
-					<div key={status} className="flex items-center space-x-3 space-y-0">
-						<RadioGroupItem value={status} type="button" />
-						<Label>{status}</Label>
+				{getCollectionProps(meta, {
+					type: 'radio',
+					options: READING_STATUSES,
+				}).map((props) => (
+					<div
+						key={props.value}
+						className="flex items-center space-x-3 space-y-0"
+					>
+						<RadioGroupItem {...props} type="button" />
+						<Label htmlFor={props.id}>{props.value}</Label>
 					</div>
 				))}
 			</RadioGroup>

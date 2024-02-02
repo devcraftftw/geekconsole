@@ -6,6 +6,7 @@ import { Label } from '../Label/Label';
 import { Textarea } from '../Textarea/Textarea';
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined;
+
 export function ErrorList({
 	id,
 	errors,
@@ -15,6 +16,7 @@ export function ErrorList({
 }) {
 	const errorsToRender = errors?.filter(Boolean);
 	if (!errorsToRender?.length) return null;
+
 	return (
 		<ul id={id} className="flex flex-col gap-1">
 			{errorsToRender.map((e) => (
@@ -39,6 +41,7 @@ export function Field({
 	const fallbackId = useId();
 	const id = inputProps.id ?? fallbackId;
 	const errorId = errors?.length ? `${id}-error` : undefined;
+
 	return (
 		<div className={className}>
 			<Label htmlFor={id} {...labelProps} />
