@@ -60,17 +60,27 @@ export default function BookOverview() {
 						</span>
 					</div>
 					<ul className="flex flex-wrap gap-5 py-5">
-						{book.images.map((image, index) => (
-							<li key={image.id}>
-								<a href={getBookImgSrc(image.id)}>
-									<img
-										src={getBookImgSrc(image.id)}
-										alt={image.altText ?? `${book.title}/${index + 1}`}
-										className="size-32 rounded-lg object-cover"
-									/>
-								</a>
+						{book.images.length > 0 ? (
+							book.images.map((image, index) => (
+								<li key={image.id}>
+									<a href={getBookImgSrc(image.id)}>
+										<img
+											src={getBookImgSrc(image.id)}
+											alt={image.altText ?? `${book.title}/${index + 1}`}
+											className="size-32 rounded-lg object-cover"
+										/>
+									</a>
+								</li>
+							))
+						) : (
+							<li>
+								<img
+									src={getBookImgSrc(null)}
+									alt="Placeholder"
+									className="w-32 rounded-lg"
+								/>
 							</li>
-						))}
+						)}
 					</ul>
 				</div>
 				<div className="w-3/4">

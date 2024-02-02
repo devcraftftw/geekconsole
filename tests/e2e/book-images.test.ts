@@ -120,13 +120,37 @@ test('Users can edit book image', async ({ page, login }) => {
 	await expect(page.getByAltText(altText)).toBeVisible();
 });
 
-test('Users can delete book image', async ({ page, login }) => {
+test('Users can delete last book image', async ({ page, login }) => {
 	const user = await login();
 
 	const book = await prisma.book.create({
 		select: { id: true, title: true },
 		data: {
 			...createBookWithImage(),
+			ownerId: user.id,
+		},
+	});
+
+	await page.goto(`/dashboard/books/${book.id}`);
+
+	await expect(page.getByRole('heading', { name: book.title })).toBeVisible();
+
+	await page.getByRole('link', { name: 'Edit', exact: true }).click();
+	await page.getByRole('button', { name: 'remove image' }).click();
+	await page.getByRole('button', { name: 'submit' }).click();
+
+	await expect(page).toHaveURL(new RegExp(`/dashboard/books/${book.id}`));
+
+	await expect(page.getByAltText('Placeholder')).toBeVisible();
+});
+
+test('Users can delete book image', async ({ page, login }) => {
+	const user = await login();
+
+	const book = await prisma.book.create({
+		select: { id: true, title: true },
+		data: {
+			...createBookWithMultipleImages(),
 			ownerId: user.id,
 		},
 	});
@@ -145,7 +169,7 @@ test('Users can delete book image', async ({ page, login }) => {
 	const countBefore = await images.count();
 
 	await page.getByRole('link', { name: 'Edit', exact: true }).click();
-	await page.getByRole('button', { name: 'remove image' }).click();
+	await page.getByRole('button', { name: 'remove image' }).nth(0).click();
 	await page.getByRole('button', { name: 'submit' }).click();
 
 	await expect(page).toHaveURL(new RegExp(`/dashboard/books/${book.id}`));
@@ -177,5 +201,35 @@ function createBookWithImage() {
 		},
 	} satisfies Omit<Book, 'id' | 'createdAt' | 'updatedAt' | 'ownerId'> & {
 		images: { create: Pick<BookImage, 'blob' | 'contentType'> };
+	};
+}
+
+function createBookWithMultipleImages() {
+	return {
+		...createBook(),
+		images: {
+			create: [
+				{
+					contentType: 'image/png',
+					blob: fs.readFileSync(
+						'tests/fixtures/images/my-books/cute-koala.png',
+					),
+				},
+				{
+					contentType: 'image/png',
+					blob: fs.readFileSync(
+						'tests/fixtures/images/my-books/koala-coder.png',
+					),
+				},
+				{
+					contentType: 'image/png',
+					blob: fs.readFileSync(
+						'tests/fixtures/images/my-books/koala-eating.png',
+					),
+				},
+			],
+		},
+	} satisfies Omit<Book, 'id' | 'createdAt' | 'updatedAt' | 'ownerId'> & {
+		images: { create: Pick<BookImage, 'blob' | 'contentType'>[] };
 	};
 }

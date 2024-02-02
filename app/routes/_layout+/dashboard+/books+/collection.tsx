@@ -162,7 +162,7 @@ export const BookCard = ({
 			<CardContent className="flex flex-col items-center gap-2">
 				<img
 					className="size-40 max-w-full rounded-xl align-middle"
-					src={imageId ? getBookImgSrc(imageId) : 'images/noCover.gif'}
+					src={getBookImgSrc(imageId)}
 					alt={book.title}
 				/>
 				<Badge variant="outline">{readingStatus}</Badge>
