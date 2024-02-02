@@ -52,9 +52,9 @@ ENV DATABASE_URL="file:./data.db"
 ENV DATABASE_PATH="./prisma/data.db"
 ENV CACHE_DATABASE_PATH="./other/cache.db"
 
-# ENV GITHUB_CLIENT_ID=$GITHUB_CLIENT_ID
-# ENV GITHUB_CLIENT_SECRET=$GITHUB_CLIENT_SECRET
-# ENV GITHUB_TOKEN=$GITHUB_TOKEN
+ENV GITHUB_CLIENT_ID=$GITHUB_CLIENT_ID
+ENV GITHUB_CLIENT_SECRET=$GITHUB_CLIENT_SECRET
+ENV GITHUB_TOKEN=$GITHUB_TOKEN
 
 # add shortcut for connecting to database CLI
 RUN echo "#!/bin/sh\nset -x\nsqlite3 \$DATABASE_URL" > /usr/local/bin/database-cli && chmod +x /usr/local/bin/database-cli
