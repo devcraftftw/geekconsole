@@ -26,8 +26,8 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
 ADD package.json package-lock.json .npmrc ./
-# RUN npm prune --omit=dev
-RUN npm ci --only=production
+RUN npm prune --omit=dev
+# RUN npm ci --only=production
 
 # Build the app
 FROM base as build
