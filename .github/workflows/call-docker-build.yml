@@ -59,16 +59,22 @@
         image-names: |
           ghcr.io/${{ github.repository }}
   
+        # tag-rules: |
+        #   type=raw,value=stable-{{date 'YYYYMMDD'}}-{{sha}},enable={{is_default_branch}},priority=300
+        #   type=ref,event=tag,priority=200
+        #   type=raw,value=latest,enable={{is_default_branch}},priority=100
+        #   type=raw,value=gha-${{ github.run_id }},enable=${{github.event_name == 'pull_request'}},priority=200
+        #   type=ref,event=pr,priority=100
         tag-rules: |
-          type=raw,value=stable-{{date 'YYYYMMDD'}}-{{sha}},enable={{is_default_branch}},priority=300
+          type=raw,value=stable-{{date 'YYYYMMDD'}}-{{sha}},enable=true,priority=300
           type=ref,event=tag,priority=200
-          type=raw,value=latest,enable={{is_default_branch}},priority=100
+          type=raw,value=latest,enable=true,priority=100
           type=raw,value=gha-${{ github.run_id }},enable=${{github.event_name == 'pull_request'}},priority=200
           type=ref,event=pr,priority=100
   
         context: "{{defaultContext}}"
-        
-        target:
+        file: "./Dockerfile_dev"
+        target: "gc"
         platforms: linux/amd64
         
         comment-enable: true
