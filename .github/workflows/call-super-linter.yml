@@ -3,8 +3,9 @@
   name: call-superlinter
   
   on:
+    workflow_dispatch:
     push:
-      branches: [main]
+      branches: [devops]
     # pull_request:
   
   jobs:
@@ -22,15 +23,15 @@
   
       #FIXME: customize uri to point to your own linter repository
       # uses: devcraftftw/super-linter-workflow/.github/workflows/reusable-super-linter.yaml@main
-      uses: ./.github/workflows/reusable-super-linter.yml
+      uses: devcraftftw/actions/.github/workflows/reusable-super-linter.yml@main
       
       ### Optional settings examples
       
-      # with:
-        ### For a DevOps-focused repository. Prevents some code-language linters from running
-        ### defaults to false
-        # devops-only: false
+      with:
+        ## For a DevOps-focused repository. Prevents some code-language linters from running
+        ## defaults to false
+        devops-only: true
         
-        ### A regex to exclude files from linting
-        ### defaults to empty
-        # filter-regex-exclude: html/.*
+        ## A regex to exclude files from linting
+        ## defaults to empty
+        filter-regex-exclude: /github/workspace/app/*
