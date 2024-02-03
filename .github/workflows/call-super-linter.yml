@@ -32,6 +32,6 @@
         ## defaults to false
         devops-only: true
         
-        ### A regex to exclude files from linting
-        ### defaults to empty
-        # filter-regex-exclude: html/.*
+        ## A regex to exclude files from linting
+        ## defaults to empty
+        filter-regex-exclude: /github/workspace/app/*
