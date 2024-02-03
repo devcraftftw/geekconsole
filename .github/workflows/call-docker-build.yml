@@ -27,7 +27,7 @@
       name: Call Docker Build
   
       # FIXME: fork this repo and update this path to YOUR reusable workflow location
-      uses: devcraftftw/actions/.github/workflows/reusable-docker-build.yaml@main
+      uses: devcraftftw/actions/.github/workflows/reusable-docker-build.yml@main
   
       # set permissions here to be equal or greater than what's required in the Reusable Workflow
       # Permisions set here for the GITHUB_TOKEN are then passed to the Reusable Workflow
