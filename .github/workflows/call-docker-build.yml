@@ -78,3 +78,10 @@
         platforms: linux/amd64
         
         comment-enable: true
+
+    scan:
+      name: Scan Image
+      needs: [call-docker-build]
+      uses: devcraftftw/actions/.github/workflows/reusable-trivy.yml@main
+      with:
+        image: 'ghcr.io/devcraftftw/geekconsole:${{ needs.call-docker-build.outputs.image-tag }}'
