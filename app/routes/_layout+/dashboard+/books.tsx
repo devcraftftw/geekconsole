@@ -8,7 +8,7 @@ import {
 	useLocation,
 } from '@remix-run/react';
 
-import { requireUserId } from '~/app/core/server/index.ts';
+import { prisma, requireUserId } from '~/app/core/server/index.ts';
 import { type BreadcrumbHandle } from '~/app/shared/schemas';
 import { Button } from '~/app/shared/ui/index.ts';
 
@@ -58,5 +58,14 @@ export default function Books() {
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	await requireUserId(request);
-	return json({});
+
+	const readingStatuses = await prisma.bookReadingStatus.findMany({
+		select: { id: true, name: true },
+	});
+
+	console.log(readingStatuses);
+
+	return json({
+		bookReadingStatuses: readingStatuses,
+	});
 };
