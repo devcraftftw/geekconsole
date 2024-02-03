@@ -95,7 +95,7 @@ model CarSpending {
 
 model CarSpendingType {
   id          String        @id @default(cuid())
-  name        String
+  name        String        @unique
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   CarSpending CarSpending[]

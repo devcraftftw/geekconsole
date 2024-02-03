@@ -223,7 +223,9 @@ function SpendingTypesSelect({ meta }: { meta: FieldMetadata<string> }) {
 				defaultValue={meta.initialValue}
 				onValueChange={control.change}
 			>
-				<SelectTrigger className="w-full">
+				<SelectTrigger
+					className={cn('w-full', meta.errors ? 'border-input-invalid' : '')}
+				>
 					<SelectValue placeholder="Select an expense type" />
 				</SelectTrigger>
 				<SelectContent>
@@ -271,6 +273,7 @@ function ExpenseDatePicker({ meta }: { meta: FieldMetadata<string> }) {
 						className={cn(
 							'w-full justify-start text-left font-normal',
 							!date && 'text-muted-foreground',
+							meta.errors ? 'border-input-invalid' : '',
 						)}
 					>
 						<Icon name="calendar" size="sm" className="mr-2" />
