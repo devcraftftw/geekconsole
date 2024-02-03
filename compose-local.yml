@@ -1,0 +1,13 @@
+services:
+  geekconsole:
+    container_name: geekconsole-local
+    image: geekconsole-local # docker build -t geekconsole-local -f Dockerfile_dev .
+    build:
+      context: .
+      target: gc
+      dockerfile: ./Dockerfile_dev
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - 3000:3000

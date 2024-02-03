@@ -1,5 +1,5 @@
-import { useForm } from '@conform-to/react';
-import { parse } from '@conform-to/zod';
+import { getFormProps, useForm } from '@conform-to/react';
+import { parseWithZod } from '@conform-to/zod';
 import { invariant, invariantResponse } from '@epic-web/invariant';
 import { type SEOHandle } from '@nasa-gcn/remix-seo';
 import { createId } from '@paralleldrive/cuid2';
@@ -103,6 +103,79 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 	getSitemapEntries: () => null,
 };
 
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+	const userId = await requireUserId(request);
+
+	const spendings = await prisma.carSpending.findMany({
+		where: { ownerId: userId },
+		select: { id: true, typeId: true, date: true, value: true, comment: true },
+	});
+
+	const spendingTypes = await prisma.carSpendingType.findMany({
+		select: { id: true, name: true },
+	});
+
+	const totalAmountSpent = spendings.reduce((acc, val) => val.value + acc, 0);
+
+	return json({
+		spendings,
+		spendingTypes,
+		totalAmountSpent,
+	});
+};
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+	const userId = await requireUserId(request);
+
+	const formData = await request.formData();
+
+	await validateCSRF(formData, request.headers);
+
+	const submission = parseWithZod(formData, {
+		schema: DeleteExpenseFormSchema,
+	});
+
+	if (submission.status !== 'success') {
+		return json(
+			{ result: submission.reply() },
+			{
+				status: submission.status === 'error' ? 400 : 200,
+			},
+		);
+	}
+
+	const { expenseId } = submission.value;
+
+	const expense = await prisma.carSpending.findFirst({
+		select: { id: true, ownerId: true },
+		where: { id: expenseId },
+	});
+
+	invariantResponse(expense, 'Not found', { status: 404 });
+
+	const isOwner = userId === expense.ownerId;
+	await requireUserWithPermission(
+		request,
+		isOwner ? 'delete:carSpending:own' : 'delete:carSpending:any',
+	);
+
+	await prisma.carSpending.delete({ where: { id: expense.id } });
+
+	const successToast: ToastInput = {
+		id: createId(),
+		type: 'success',
+		title: 'Expense deleted',
+		description: 'Car expense has been deleted',
+	};
+
+	return json(
+		{ result: submission.reply() },
+		{
+			headers: await createToastHeaders(successToast),
+		},
+	);
+};
+
 export default function CarRoute() {
 	return (
 		<>
@@ -124,18 +197,18 @@ export function DeleteExpense({ id }: { id: string }) {
 	const isPending = useIsPending();
 	const [form] = useForm({
 		id: 'deleteExpense',
-		lastSubmission: actionData?.submission,
+		lastResult: actionData?.result,
 	});
 
 	const submit = (event: FormEvent<HTMLFormElement>) => {
-		form.props.onSubmit(event);
+		form.onSubmit(event);
 
 		// dirty hack to programatically close dropdown after item removal
 		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	};
 
 	return (
-		<Form method="POST" {...form.props} onSubmit={submit}>
+		<Form method="POST" {...getFormProps(form)} onSubmit={submit}>
 			<AuthenticityTokenInput />
 			<input type="hidden" name="expenseId" value={id} />
 
@@ -144,7 +217,7 @@ export function DeleteExpense({ id }: { id: string }) {
 				name="intent"
 				value={DELETE_EXPENSE_INTENT}
 				variant="destructive"
-				status={isPending ? 'pending' : actionData?.status ?? 'idle'}
+				status={isPending ? 'pending' : form.status ?? 'idle'}
 				disabled={isPending}
 				className="w-full max-md:aspect-square max-md:px-0"
 			>
@@ -370,75 +443,6 @@ function DataTableToolbar<TData>({ table }: DataTableToolbarProps<TData>) {
 		</div>
 	);
 }
-
-export const action = async ({ request }: ActionFunctionArgs) => {
-	const userId = await requireUserId(request);
-
-	const formData = await request.formData();
-
-	await validateCSRF(formData, request.headers);
-
-	const submission = parse(formData, {
-		schema: DeleteExpenseFormSchema,
-	});
-
-	if (submission.intent !== 'submit') {
-		return json({ status: 'idle', submission } as const);
-	}
-
-	if (!submission.value) {
-		return json({ status: 'error', submission } as const, { status: 400 });
-	}
-
-	const { expenseId } = submission.value;
-
-	const expense = await prisma.carSpending.findFirst({
-		select: { id: true, ownerId: true },
-		where: { id: expenseId },
-	});
-
-	invariantResponse(expense, 'Not found', { status: 404 });
-
-	const isOwner = userId === expense.ownerId;
-	await requireUserWithPermission(
-		request,
-		isOwner ? 'delete:carSpending:own' : 'delete:carSpending:any',
-	);
-
-	await prisma.carSpending.delete({ where: { id: expense.id } });
-
-	const successToast: ToastInput = {
-		id: createId(),
-		type: 'success',
-		title: 'Expense deleted',
-		description: 'Car expense has been deleted',
-	};
-
-	return json({ status: 'idle', submission } as const, {
-		headers: await createToastHeaders(successToast),
-	});
-};
-
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-	const userId = await requireUserId(request);
-
-	const spendings = await prisma.carSpending.findMany({
-		where: { ownerId: userId },
-		select: { id: true, typeId: true, date: true, value: true, comment: true },
-	});
-
-	const spendingTypes = await prisma.carSpendingType.findMany({
-		select: { id: true, name: true },
-	});
-
-	const totalAmountSpent = spendings.reduce((acc, val) => val.value + acc, 0);
-
-	return json({
-		spendings,
-		spendingTypes,
-		totalAmountSpent,
-	});
-};
 
 export function ErrorBoundary() {
 	return (

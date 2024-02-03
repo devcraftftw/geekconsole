@@ -6,7 +6,7 @@ name: Devops
 # Multi-arch builds for amd64 and arm64 enabled
 
 on:
-  push:
+  # push:
   #   branches:
   #     - devops
   # pull_request: {}
@@ -56,7 +56,7 @@ jobs:
             latest=false
           # enable these tag generators (I tend to enable them all)
           tags: |
-            type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+            type=raw,value=devops,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
             type=ref,event=pr
             type=ref,event=branch
             type=semver,pattern={{version}}

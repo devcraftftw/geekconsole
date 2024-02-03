@@ -8,22 +8,26 @@ test('Users can create books', async ({ page, login }) => {
 	await page.goto(`/dashboard/books`);
 
 	const newBook = createBook();
+
 	await page.getByRole('link', { name: /add a new book/i }).click();
 
 	// fill in form and submit
 	await page.getByRole('textbox', { name: 'title' }).fill(newBook.title);
 	await page.getByRole('textbox', { name: 'author' }).fill(newBook.author);
 	await page
+		.getByRole('spinbutton', { name: 'year' })
+		.fill(newBook.year.toString());
+	await page
 		.getByRole('textbox', { name: 'description' })
 		.fill(newBook.description);
-	await page.getByRole('radio').nth(0).click();
+	await page.getByRole('radio').nth(1).setChecked(true);
 	await page
 		.getByRole('textbox', { name: 'your comments' })
 		.fill(newBook.comment);
 
 	await page.getByRole('button', { name: /submit/i }).click();
 
-	await expect(page).toHaveURL(new RegExp(`/dashboard/books/.*`));
+	await expect(page).not.toHaveURL(new RegExp(`/dashboard/books/new`));
 	await expect(
 		page.getByRole('heading', { name: newBook.title }),
 	).toBeVisible();
@@ -47,9 +51,12 @@ test('Users can edit books', async ({ page, login }) => {
 	await page.getByRole('textbox', { name: 'title' }).fill(updatedBook.title);
 	await page.getByRole('textbox', { name: 'author' }).fill(updatedBook.author);
 	await page
+		.getByRole('spinbutton', { name: 'year' })
+		.fill(updatedBook.year.toString());
+	await page
 		.getByRole('textbox', { name: 'description' })
 		.fill(updatedBook.description);
-	await page.getByRole('radio').nth(0).click();
+	await page.getByRole('radio').nth(2).click();
 	await page
 		.getByRole('textbox', { name: 'your comments' })
 		.fill(updatedBook.comment);

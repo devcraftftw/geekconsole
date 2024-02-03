@@ -54,6 +54,7 @@ export function Icon({
 			</span>
 		);
 	}
+
 	return (
 		<svg
 			{...props}

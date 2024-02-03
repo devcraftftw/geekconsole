@@ -1,3 +1,4 @@
+import { invariant } from '@epic-web/invariant';
 import { faker } from '@faker-js/faker';
 import { http } from 'msw';
 import { afterEach, test, expect } from 'vitest';
@@ -12,7 +13,6 @@ import {
 } from '~/app/core/server/index.ts';
 import { loader } from '~/app/routes/_layout+/_auth+/auth.$provider.callback.ts';
 import { twoFAVerificationType } from '~/app/routes/_layout+/settings+/profile.two-factor.tsx';
-import { invariant } from '@epic-web/invariant';
 import { BASE_URL, convertSetCookieToCookie } from '~/tests/utils.ts';
 import { createUser } from '../db-utils.ts';
 import { deleteGitHubUsers, insertGitHubUser } from '../mocks/github.ts';

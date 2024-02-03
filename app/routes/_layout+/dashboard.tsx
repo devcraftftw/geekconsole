@@ -28,10 +28,11 @@ const DASHBOARD_ROUTES = [
 		path: 'car',
 		text: 'Car to Maintain',
 	},
-	{
-		path: 'games',
-		text: 'Games to Play',
-	},
+	// NOTE coming soon
+	// {
+	// 	path: 'games',
+	// 	text: 'Games to Play',
+	// },
 ];
 
 const NAV_LINK_DEFAULT_CN =

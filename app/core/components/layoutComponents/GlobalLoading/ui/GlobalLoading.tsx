@@ -17,7 +17,7 @@ export function GlobalLoading() {
 			)}
 		>
 			<svg
-				className="h-7 w-7 animate-spin"
+				className="size-7 animate-spin"
 				xmlns="http://www.w3.org/2000/svg"
 				fill="none"
 				viewBox="0 0 24 24"

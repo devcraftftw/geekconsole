@@ -3,8 +3,10 @@ import { useTheme } from '~/app/shared/lib/hooks';
 export default function DashboardIndexRoute() {
 	return (
 		<div className="flex size-full flex-col items-center justify-center gap-4">
-			<p>This is your Dashboard.</p>
-			<p>Select a section from the left sidebar to get started.</p>
+			<h3 className="text-xl font-bold">This is your Dashboard</h3>
+			<p className="mb-4">
+				Select a section from the left sidebar to get started
+			</p>
 			<Placeholder />
 		</div>
 	);

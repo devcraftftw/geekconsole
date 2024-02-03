@@ -1,7 +1,7 @@
 services:
   geekconsole:
     container_name: geekconsole-dev
-    image: ghcr.io/devcraftftw/geekconsole:develop
+    image: ${IMAGE_NAME}
     restart: unless-stopped
     pull_policy: always
     environment:
@@ -13,6 +13,11 @@ services:
       - HONEYPOT_SECRET=${HONEYPOT_SECRET}
       - SESSION_SECRET=${SESSION_SECRET}
       - INTERNAL_COMMAND_TOKEN=${INTERNAL_COMMAND_TOKEN}
+    # devices:
+    #   - "/dev/fuse:/dev/fuse"
+    # cap_add:
+    #   - SYS_ADMIN
+    # privileged: true
     networks:
       - proxy
 

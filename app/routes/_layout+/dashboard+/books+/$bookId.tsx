@@ -1,5 +1,5 @@
-import { useForm } from '@conform-to/react';
-import { parse } from '@conform-to/zod';
+import { getFormProps, useForm } from '@conform-to/react';
+import { parseWithZod } from '@conform-to/zod';
 import { invariantResponse } from '@epic-web/invariant';
 import { type SEOHandle } from '@nasa-gcn/remix-seo';
 import { createId } from '@paralleldrive/cuid2';
@@ -60,17 +60,27 @@ export default function BookOverview() {
 						</span>
 					</div>
 					<ul className="flex flex-wrap gap-5 py-5">
-						{book.images.map((image) => (
-							<li key={image.id}>
-								<a href={getBookImgSrc(image.id)}>
-									<img
-										src={getBookImgSrc(image.id)}
-										alt={image.altText ?? ''}
-										className="size-32 rounded-lg object-cover"
-									/>
-								</a>
+						{book.images.length > 0 ? (
+							book.images.map((image, index) => (
+								<li key={image.id}>
+									<a href={getBookImgSrc(image.id)}>
+										<img
+											src={getBookImgSrc(image.id)}
+											alt={image.altText ?? `${book.title}/${index + 1}`}
+											className="size-32 rounded-lg object-cover"
+										/>
+									</a>
+								</li>
+							))
+						) : (
+							<li>
+								<img
+									src={getBookImgSrc(null)}
+									alt="Placeholder"
+									className="w-32 rounded-lg"
+								/>
 							</li>
-						))}
+						)}
 					</ul>
 				</div>
 				<div className="w-3/4">
@@ -127,11 +137,11 @@ export function DeleteBook({ id }: { id: string }) {
 	const isPending = useIsPending();
 	const [form] = useForm({
 		id: 'deleteBook',
-		lastSubmission: actionData?.submission,
+		lastResult: actionData?.result,
 	});
 
 	return (
-		<Form method="POST" {...form.props}>
+		<Form method="POST" {...getFormProps(form)}>
 			<AuthenticityTokenInput />
 			<input type="hidden" name="bookId" value={id} />
 			<StatusButton
@@ -139,7 +149,7 @@ export function DeleteBook({ id }: { id: string }) {
 				name="intent"
 				value={DELETE_BOOK_INTENT}
 				variant="destructive"
-				status={isPending ? 'pending' : actionData?.status ?? 'idle'}
+				status={isPending ? 'pending' : form.status ?? 'idle'}
 				disabled={isPending}
 				className="w-full max-md:aspect-square max-md:px-0"
 			>
@@ -192,16 +202,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 	await validateCSRF(formData, request.headers);
 
-	const submission = parse(formData, {
+	const submission = parseWithZod(formData, {
 		schema: DeleteBookFormSchema,
 	});
 
-	if (submission.intent !== 'submit') {
-		return json({ status: 'idle', submission } as const);
-	}
-
-	if (!submission.value) {
-		return json({ status: 'error', submission } as const, { status: 400 });
+	if (submission.status !== 'success') {
+		return json(
+			{ result: submission.reply() },
+			{
+				status: submission.status === 'error' ? 400 : 200,
+			},
+		);
 	}
 
 	const { bookId } = submission.value;
@@ -232,7 +243,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	const bookName = data?.book.title ?? 'Book';
 	const bookSummary =
-		data && data.book.description.length > 100
+		data && data.book.description && data.book.description.length > 100
 			? data.book.description.slice(0, 97) + '...'
 			: 'No description';
 

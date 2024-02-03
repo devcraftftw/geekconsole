@@ -49,7 +49,7 @@ model Book {
   author        String
   year          Int
   readingStatus String
-  description   String
+  description   String?
   comment       String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -95,7 +95,7 @@ model CarSpending {
 
 model CarSpendingType {
   id          String        @id @default(cuid())
-  name        String
+  name        String        @unique
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   CarSpending CarSpending[]
