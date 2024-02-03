@@ -22,6 +22,7 @@
       --muted-foreground: 18 7% 25%;
       --border: 48 6% 94%;
       --input: 48 6% 94%;
+      --input-invalid: 0 84.2% 60.2%;
       --ring: 48 96% 53%;
       --radius: 0.5rem;
     }
@@ -45,6 +46,7 @@
       --muted-foreground: 18 7% 75%;
       --border: 48 6% 15%;
       --input: 48 6% 15%;
+      --input-invalid: 0 62.8% 30.6%;
       --ring: 48 96% 53%;
     }
   }
@@ -59,8 +61,6 @@
 
 	body {
 		@apply bg-background text-foreground;
-
-		min-height: 100dvh;
 
 		font-feature-settings:
 			'rlig' 1,

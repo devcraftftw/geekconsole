@@ -1,7 +1,11 @@
 import { Link } from '@remix-run/react';
+import { useTheme } from '~/app/shared/lib/hooks/index.ts';
 import { Button } from '~/app/shared/ui/index.ts';
 
 export const Footer = () => {
+	const theme = useTheme();
+	const isDark = theme === 'dark';
+
 	return (
 		<footer className="w-full border-t border-foreground/10 py-8">
 			<div className="mx-auto w-full px-4 pt-6 lg:px-20">
@@ -11,7 +15,7 @@ export const Footer = () => {
 							<Link to="/">
 								<img
 									className="h-8 w-auto"
-									src="/images/geekConsole3.png"
+									src={`/images/gk-logo-${isDark ? 'dark' : 'light'}.png`}
 									alt="Footer logo"
 								/>
 							</Link>
@@ -45,7 +49,7 @@ export const Footer = () => {
 											<Button asChild variant="link">
 												<a
 													className="pl-0"
-													href="https://github.com/vVolodya"
+													href="https://github.com/devcraftftw/geekconsole"
 													target="_blank"
 													rel="noopener noreferrer"
 												>
