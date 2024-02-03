@@ -34,7 +34,7 @@ export const UserNav = () => {
 						onClick={(e) => e.preventDefault()}
 						className="flex items-center gap-2"
 					>
-						<Avatar className="h-12 w-12">
+						<Avatar className="size-12">
 							<AvatarImage
 								src={getUserImgSrc(user.image?.id)}
 								alt={user.name ?? user.username}

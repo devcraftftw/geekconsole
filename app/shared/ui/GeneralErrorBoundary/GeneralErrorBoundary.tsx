@@ -30,7 +30,7 @@ export function GeneralErrorBoundary({
 	if (typeof document !== 'undefined') console.error(error);
 
 	return (
-		<div className="mx-auto flex h-full w-full items-center justify-center p-20 text-h2">
+		<div className="mx-auto flex size-full items-center justify-center p-20 text-h2">
 			{isRouteErrorResponse(error)
 				? (statusHandlers?.[error.status] ?? defaultStatusHandler)({
 						error,

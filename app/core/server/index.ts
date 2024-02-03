@@ -30,11 +30,9 @@ export {
 	SESSION_KEY,
 } from './auth/auth.server.ts';
 export {
-	userHasRole,
-	userHasPermission,
 	requireUserWithPermission,
 	requireUserWithRole,
-} from './permissions/permissions.ts';
+} from './permissions/permissions.server.ts';
 export { sendEmail } from './email/email.server.ts';
 export { verifySessionStorage } from './verification/verification.server.ts';
 export {

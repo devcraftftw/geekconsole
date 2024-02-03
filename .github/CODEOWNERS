@@ -1,0 +1,17 @@
+*       @slayoffer @vVolodya
+
+*.js    @vVolodya
+
+*.ts    @vVolodya
+
+*.json  @vVolodya
+
+*.go    @slayoffer @vVolodya
+
+*.yaml  @slayoffer
+
+*.yml  @slayoffer
+
+/.github/ @slayoffer
+
+/.gitlab/ @slayoffer

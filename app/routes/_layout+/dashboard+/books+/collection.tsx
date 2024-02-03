@@ -1,6 +1,7 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo';
 import { type Book, type BookImage } from '@prisma/client';
 import {
+	type MetaFunction,
 	type SerializeFrom,
 	type LoaderFunctionArgs,
 	json,
@@ -37,6 +38,18 @@ import {
 	ErrorList,
 } from '~/app/shared/ui/index.ts';
 
+export const meta: MetaFunction = () => {
+	return [
+		{ title: 'Books collection | GeekConsole' },
+		{ name: 'description', content: 'Your books collection' },
+	];
+};
+
+export const handle: BreadcrumbHandle & SEOHandle = {
+	breadcrumb: 'Collection',
+	getSitemapEntries: () => null,
+};
+
 type BookPreviewWithImgs = Pick<Book, 'id' | 'title' | 'readingStatus'> & {
 	imageId: Pick<BookImage, 'id'>['id'] | null;
 };
@@ -48,11 +61,6 @@ const BooksSearchResultSchema = z.object({
 	imageId: z.string().nullable(),
 });
 const BooksSearchResultsSchema = z.array(BooksSearchResultSchema);
-
-export const handle: BreadcrumbHandle & SEOHandle = {
-	breadcrumb: 'Collection',
-	getSitemapEntries: () => null,
-};
 
 export default function BooksCollectionRoute() {
 	const data = useLoaderData<typeof loader>();
@@ -153,8 +161,8 @@ export const BookCard = ({
 			</CardHeader>
 			<CardContent className="flex flex-col items-center gap-2">
 				<img
-					className="h-40 w-40 max-w-full rounded-xl align-middle"
-					src={imageId ? getBookImgSrc(imageId) : 'images/noCover.gif'}
+					className="size-40 max-w-full rounded-xl align-middle"
+					src={getBookImgSrc(imageId)}
 					alt={book.title}
 				/>
 				<Badge variant="outline">{readingStatus}</Badge>

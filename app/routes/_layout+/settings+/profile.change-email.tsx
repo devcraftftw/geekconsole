@@ -1,5 +1,5 @@
-import { conform, useForm } from '@conform-to/react';
-import { getFieldsetConstraint, parse } from '@conform-to/zod';
+import { getFormProps, getInputProps, useForm } from '@conform-to/react';
+import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { invariant } from '@epic-web/invariant';
 import { type SEOHandle } from '@nasa-gcn/remix-seo';
 import * as E from '@react-email/components';
@@ -45,7 +45,10 @@ export async function handleVerification({
 }: VerifyFunctionArgs) {
 	await requireRecentVerification(request);
 
-	invariant(submission.value, 'submission.value should be defined by now');
+	invariant(
+		submission.status === 'success',
+		'Submission should be successful by now',
+	);
 
 	const verifySession = await verifySessionStorage.getSession(
 		request.headers.get('cookie'),
@@ -54,11 +57,16 @@ export async function handleVerification({
 	const newEmail = verifySession.get(newEmailAddressSessionKey);
 
 	if (!newEmail) {
-		submission.error[''] = [
-			'You must submit the code on the same device that requested the email change.',
-		];
-
-		return json({ status: 'error', submission } as const, { status: 400 });
+		return json(
+			{
+				result: submission.reply({
+					formErrors: [
+						'You must submit the code on the same device that requested the email change.',
+					],
+				}),
+			},
+			{ status: 400 },
+		);
 	}
 
 	const preUpdateUser = await prisma.user.findFirstOrThrow({
@@ -121,7 +129,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	await validateCSRF(formData, request.headers);
 
-	const submission = await parse(formData, {
+	const submission = await parseWithZod(formData, {
 		schema: ChangeEmailSchema.superRefine(async (data, ctx) => {
 			const existingUser = await prisma.user.findUnique({
 				where: { email: data.email },
@@ -138,12 +146,13 @@ export async function action({ request }: ActionFunctionArgs) {
 		async: true,
 	});
 
-	if (submission.intent !== 'submit') {
-		return json({ status: 'idle', submission } as const);
-	}
-
-	if (!submission.value) {
-		return json({ status: 'error', submission } as const, { status: 400 });
+	if (submission.status !== 'success') {
+		return json(
+			{ result: submission.reply() },
+			{
+				status: submission.status === 'error' ? 400 : 200,
+			},
+		);
 	}
 
 	const { otp, redirectTo, verifyUrl } = await prepareVerification({
@@ -169,8 +178,14 @@ export async function action({ request }: ActionFunctionArgs) {
 			},
 		});
 	} else {
-		submission.error[''] = [response.error.message];
-		return json({ status: 'error', submission } as const, { status: 500 });
+		return json(
+			{
+				result: submission.reply({ formErrors: [response.error.message] }),
+			},
+			{
+				status: 500,
+			},
+		);
 	}
 }
 
@@ -236,10 +251,10 @@ export default function ChangeEmailRoute() {
 
 	const [form, fields] = useForm({
 		id: 'change-email-form',
-		constraint: getFieldsetConstraint(ChangeEmailSchema),
-		lastSubmission: actionData?.submission,
+		constraint: getZodConstraint(ChangeEmailSchema),
+		lastResult: actionData?.result,
 		onValidate({ formData }) {
-			return parse(formData, { schema: ChangeEmailSchema });
+			return parseWithZod(formData, { schema: ChangeEmailSchema });
 		},
 	});
 
@@ -251,13 +266,13 @@ export default function ChangeEmailRoute() {
 				An email notice will also be sent to your old address {data.user.email}.
 			</p>
 			<div className="mx-auto mt-5 max-w-sm">
-				<Form method="POST" {...form.props}>
+				<Form method="POST" {...getFormProps(form)}>
 					<AuthenticityTokenInput />
 
 					<Field
 						labelProps={{ children: 'New Email' }}
 						inputProps={{
-							...conform.input(fields.email),
+							...getInputProps(fields.email, { type: 'email' }),
 							autoComplete: 'email',
 						}}
 						errors={fields.email.errors}
@@ -267,7 +282,7 @@ export default function ChangeEmailRoute() {
 
 					<div>
 						<StatusButton
-							status={isPending ? 'pending' : actionData?.status ?? 'idle'}
+							status={isPending ? 'pending' : form.status ?? 'idle'}
 						>
 							Send Confirmation
 						</StatusButton>

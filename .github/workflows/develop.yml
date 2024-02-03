@@ -1,50 +1,54 @@
 ---
-name: ci-cd-workflow for dev branch
+name: Develop
 
 on:
   push:
     branches:
       - develop
-  pull_request:
+  # pull_request: {}
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
 
 jobs:
 # FIRST JOB #######################################################################   
-  build-test-image:
-    name: Build Image for Testing
-    runs-on: ubuntu-latest
+  # build-test-image:
+  #   name: Build Image for Testing
+  #   runs-on: ubuntu-latest
 
-    permissions:
-      packages: write # needed to push docker image to ghcr.io
+  #   permissions:
+  #     packages: write # needed to push docker image to ghcr.io
 
-    steps:
+  #   steps:
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
 
-      # - name: Login to Docker Hub
-      #   uses: docker/login-action@v3
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+  #     # - name: Login to Docker Hub
+  #     #   uses: docker/login-action@v3
+  #     #   with:
+  #     #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #     #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Login to ghcr.io registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Login to ghcr.io registry
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Build and Push to GHCR
-        uses: docker/build-push-action@v5
-        with:
-          push: true
-          file: "./Dockerfile_dev"
-          tags: ghcr.io/devcraftftw/geekconsole:${{ github.run_id }}
-          target: gc
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64
+  #     - name: Build and Push to GHCR
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         push: true
+  #         file: "./Dockerfile_dev"
+  #         tags: ghcr.io/devcraftftw/geekconsole:${{ github.run_id }}
+  #         target: gc
+  #         cache-from: type=gha
+  #         cache-to: type=gha,mode=max
+  #         platforms: linux/amd64
     
  # NEXT JOB #######################################################################   
   # test-unit:
@@ -147,20 +151,20 @@ jobs:
   #         kubectl exec deploy/myapp -- curl --fail localhost
 
 # NEXT JOB #######################################################################   
-  scan-image:
-    name: Scan Image with Trivy
-    needs: [build-test-image]
-    runs-on: ubuntu-latest
+  # scan-image:
+  #   name: Scan Image with Trivy
+  #   needs: [build-test-image]
+  #   runs-on: ubuntu-latest
 
-    permissions:
-      contents: read # for actions/checkout to fetch code
-      packages: read # needed to pull docker image to ghcr.io
-      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+  #   permissions:
+  #     contents: read # for actions/checkout to fetch code
+  #     packages: read # needed to pull docker image to ghcr.io
+  #     security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
 
-    steps:
+  #   steps:
 
-      - name: Checkout git repo
-        uses: actions/checkout@v4
+  #     - name: Checkout git repo
+  #       uses: actions/checkout@v4
       
       # - name: Login to Docker Hub
       #   uses: docker/login-action@v3
@@ -168,22 +172,22 @@ jobs:
       #     username: ${{ secrets.DOCKERHUB_USERNAME }}
       #     password: ${{ secrets.DOCKERHUB_TOKEN }}
           
-      - name: Login to ghcr.io registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Login to ghcr.io registry
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull image to scan
-        run: docker pull ghcr.io/devcraftftw/geekconsole:"$GITHUB_RUN_ID"
+      # - name: Pull image to scan
+      #   run: docker pull ghcr.io/devcraftftw/geekconsole:"$GITHUB_RUN_ID"
         
-      - name: Run Trivy for all CVEs (non-blocking)
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ghcr.io/devcraftftw/geekconsole:${{ github.run_id }}
-          format: table
-          exit-code: 0
+      # - name: Run Trivy for all CVEs (non-blocking)
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     image-ref: ghcr.io/devcraftftw/geekconsole:${{ github.run_id }}
+      #     format: table
+      #     exit-code: 0
 
       # - name: Run Trivy for HIGH,CRITICAL CVEs and report (blocking)
       #   uses: aquasecurity/trivy-action@master
@@ -206,7 +210,7 @@ jobs:
   build-final-image:
     name: Build Final Image
     # needs: [test-unit, test-integration, test-k3d, scan-image]
-    needs: [scan-image]
+    # needs: [scan-image]
     runs-on: ubuntu-latest
 
     permissions:
@@ -246,21 +250,22 @@ jobs:
         with:
           # images: devcraftftw/geekconsole,ghcr.io/devcraftftw/geekconsole
           images: ghcr.io/devcraftftw/geekconsole
-          flavor: |
-            latest=false
-          tags: |
-            type=raw,value=99
-            type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-            type=ref,event=pr
-            type=ref,event=branch
-            type=semver,pattern={{version}}
+          # flavor: |
+          #   latest=false
+          # tags: |
+          #   type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+          #   type=ref,event=pr
+          #   type=ref,event=branch
+          #   type=semver,pattern={{version}}
+          #   ghcr.io/devcraftftw/geekconsole:${{ github.run_id }}
       
       - name: Docker Build and Push to GHCR and Docker Hub
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
+          # tags: ${{ steps.docker_meta.outputs.tags }}
+          tags: ghcr.io/devcraftftw/geekconsole:${{ github.run_id }}
+          # labels: ${{ steps.docker_meta.outputs.labels }}
           file: "./Dockerfile_dev"
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -270,39 +275,39 @@ jobs:
 
         # If PR, put image tags in the PR comments
         # from https://github.com/marketplace/actions/create-or-update-comment
-      # - name: Find comment for image tags
-      #   uses: peter-evans/find-comment@v1
-      #   if: github.event_name == 'pull_request'
-      #   id: fc
-      #   with:
-      #     issue-number: ${{ github.event.pull_request.number }}
-      #     comment-author: 'github-actions[bot]'
-      #     body-includes: Docker image tag(s) pushed
+      - name: Find comment for image tags
+        uses: peter-evans/find-comment@v1
+        if: github.event_name == 'pull_request'
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Docker image tag(s) pushed
       
-      #   # If PR, put image tags in the PR comments
-      # - name: Create or update comment for image tags
-      #   uses: peter-evans/create-or-update-comment@v1
-      #   if: github.event_name == 'pull_request'
-      #   with:
-      #     comment-id: ${{ steps.fc.outputs.comment-id }}
-      #     issue-number: ${{ github.event.pull_request.number }}
-      #     body: |
-      #       Docker image tag(s) pushed:
-      #       ```text
-      #       ${{ steps.docker_meta.outputs.tags }}
-      #       ```
+        # If PR, put image tags in the PR comments
+      - name: Create or update comment for image tags
+        uses: peter-evans/create-or-update-comment@v1
+        if: github.event_name == 'pull_request'
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Docker image tag(s) pushed:
+            ```text
+            ${{ steps.docker_meta.outputs.tags }}
+            ```
 
-      #       Labels added to images:
-      #       ```text
-      #       ${{ steps.docker_meta.outputs.labels }}
-      #       ```
-      #     edit-mode: replace
+            Labels added to images:
+            ```text
+            ${{ steps.docker_meta.outputs.labels }}
+            ```
+          edit-mode: replace
 
 # NEXT JOB #######################################################################
   deploy:
     name: Deploy Final Image
     # needs: [test-unit, test-integration, test-k3d, scan-image, build-final-image]
-    needs: [scan-image, build-final-image]
+    needs: [build-final-image]
     runs-on: ubuntu-latest
     env:
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
@@ -313,6 +318,7 @@ jobs:
       HONEYPOT_SECRET: ${{ secrets.HONEYPOT_SECRET }}
       SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
       INTERNAL_COMMAND_TOKEN: ${{ secrets.INTERNAL_COMMAND_TOKEN }}
+      IMAGE_NAME: ghcr.io/devcraftftw/geekconsole:${{ github.run_id }}
 
     permissions:
       packages: read # needed to push docker image to ghcr.io

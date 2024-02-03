@@ -1,4 +1,5 @@
-import { parse } from '@conform-to/zod';
+import { parseWithZod } from '@conform-to/zod';
+import { invariantResponse } from '@epic-web/invariant';
 import { cssBundleHref } from '@remix-run/css-bundle';
 import {
 	type HeadersFunction,
@@ -135,17 +136,11 @@ function Document({
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData();
 
-	const submission = parse(formData, {
+	const submission = parseWithZod(formData, {
 		schema: ThemeFormSchema,
 	});
 
-	if (submission.intent !== 'submit') {
-		return json({ status: 'success', submission } as const);
-	}
-
-	if (!submission.value) {
-		return json({ status: 'error', submission } as const, { status: 400 });
-	}
+	invariantResponse(submission.status === 'success', 'Invalid theme received');
 
 	const { theme } = submission.value;
 
@@ -153,7 +148,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		headers: { 'set-cookie': setTheme(theme) },
 	};
 
-	return json({ success: true, submission }, responseInit);
+	return json({ result: submission.reply() }, responseInit);
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {

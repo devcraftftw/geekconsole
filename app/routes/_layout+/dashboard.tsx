@@ -95,7 +95,7 @@ export default function Dashboard() {
 				</div>
 			</div>
 
-			<div className="flex flex-col p-6">
+			<div className="flex flex-col px-6">
 				<header className="flex h-14 items-center gap-4 rounded-md border-b bg-muted px-6">
 					<ul className="flex gap-3">
 						{breadcrumbs.map((breadcrumb, i, arr) => (

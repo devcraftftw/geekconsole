@@ -1,5 +1,8 @@
 import { json } from '@remix-run/node';
-import { type useUser } from '~/app/shared/lib/hooks/index.ts';
+import {
+	type PermissionString,
+	parsePermissionString,
+} from '../../utils/index.ts';
 import { requireUserId } from '../auth/auth.server.ts';
 import { prisma } from '../db/db.server.ts';
 
@@ -64,49 +67,4 @@ export async function requireUserWithRole(request: Request, name: string) {
 	}
 
 	return user.id;
-}
-
-type Action = 'create' | 'read' | 'update' | 'delete';
-type Entity = 'user' | 'book' | 'carSpending';
-type Access = 'own' | 'any' | 'own,any' | 'any,own';
-type PermissionString = `${Action}:${Entity}` | `${Action}:${Entity}:${Access}`;
-
-function parsePermissionString(permissionString: PermissionString) {
-	const [action, entity, access] = permissionString.split(':') as [
-		Action,
-		Entity,
-		Access | undefined,
-	];
-
-	return {
-		action,
-		entity,
-		access: access ? (access.split(',') as Array<Access>) : undefined,
-	};
-}
-
-export function userHasPermission(
-	user: Pick<ReturnType<typeof useUser>, 'roles'> | null,
-	permission: PermissionString,
-) {
-	if (!user) return false;
-
-	const { action, entity, access } = parsePermissionString(permission);
-
-	return user.roles.some((role) =>
-		role.permissions.some(
-			(permission) =>
-				permission.entity === entity &&
-				permission.action === action &&
-				(!access || access.includes(permission.access)),
-		),
-	);
-}
-
-export function userHasRole(
-	user: Pick<ReturnType<typeof useUser>, 'roles'> | null,
-	role: string,
-) {
-	if (!user) return false;
-	return user.roles.some((r) => r.name === role);
 }

@@ -1,10 +1,11 @@
 import {
-	type FieldConfig,
-	conform,
+	type FieldMetadata,
 	useForm,
-	useInputEvent,
+	useInputControl,
+	getFormProps,
+	getInputProps,
 } from '@conform-to/react';
-import { getFieldsetConstraint, parse } from '@conform-to/zod';
+import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { createId } from '@paralleldrive/cuid2';
 import { type CarSpending } from '@prisma/client';
 import {
@@ -94,12 +95,12 @@ export default function CarExpenseEditor({
 	const showSpinner = useSpinDelay(isSubmitting);
 	const [form, fields] = useForm({
 		id: 'carExpenseEditor',
-		constraint: getFieldsetConstraint(NewExpenseFormSchema),
-		lastSubmission: actionData?.submission,
+		constraint: getZodConstraint(NewExpenseFormSchema),
+		lastResult: actionData?.result,
 		shouldValidate: 'onBlur',
 		shouldRevalidate: 'onBlur',
 		onValidate({ formData }) {
-			return parse(formData, {
+			return parseWithZod(formData, {
 				schema: NewExpenseFormSchema,
 			});
 		},
@@ -124,7 +125,7 @@ export default function CarExpenseEditor({
 			}}
 		>
 			<DialogContent className="sm:max-w-[400px]">
-				<Form method="post" encType="multipart/form-data" {...form.props}>
+				<Form method="post" {...getFormProps(form)}>
 					<AuthenticityTokenInput />
 					<HoneypotInputs />
 
@@ -144,7 +145,7 @@ export default function CarExpenseEditor({
 							<Label htmlFor={fields.date.id} className="mb-2">
 								Date
 							</Label>
-							<ExpenseDatePicker inputConfig={fields.date} />
+							<ExpenseDatePicker meta={fields.date} />
 
 							<div className="min-h-[32px] px-4 pb-3 pt-1">
 								<ErrorList
@@ -158,7 +159,7 @@ export default function CarExpenseEditor({
 							<Label htmlFor={fields.typeId.id} className="mb-2">
 								Expense type
 							</Label>
-							<SpendingTypesSelect inputConfig={fields.typeId} />
+							<SpendingTypesSelect meta={fields.typeId} />
 
 							<div className="min-h-[32px] px-4 pb-3 pt-1">
 								<ErrorList
@@ -175,7 +176,7 @@ export default function CarExpenseEditor({
 								className: 'mb-3',
 							}}
 							inputProps={{
-								...conform.input(fields.value, { type: 'number' }),
+								...getInputProps(fields.value, { type: 'number' }),
 							}}
 							errors={fields.value.errors}
 						/>
@@ -187,7 +188,7 @@ export default function CarExpenseEditor({
 								className: 'mb-3',
 							}}
 							inputProps={{
-								...conform.input(fields.comment),
+								...getInputProps(fields.comment, { type: 'text' }),
 							}}
 							errors={fields.comment.errors}
 						/>
@@ -203,29 +204,23 @@ export default function CarExpenseEditor({
 	);
 }
 
-function SpendingTypesSelect({
-	inputConfig,
-}: {
-	inputConfig: FieldConfig<'typeId'>;
-}) {
+function SpendingTypesSelect({ meta }: { meta: FieldMetadata<string> }) {
 	const data = useLoaderData<typeof newRouteLoader | typeof editRouteLoader>();
 	const shadowInputRef = useRef<HTMLInputElement>(null);
-	const control = useInputEvent({
-		ref: shadowInputRef,
-	});
+	const control = useInputControl(meta);
 
 	return (
 		<>
 			<input
 				ref={shadowInputRef}
-				{...conform.input(inputConfig, {
-					hidden: true,
+				{...getInputProps(meta, {
+					type: 'hidden',
 				})}
 			/>
 
 			<Select
 				required
-				defaultValue={inputConfig.defaultValue}
+				defaultValue={meta.initialValue}
 				onValueChange={control.change}
 			>
 				<SelectTrigger className="w-full">
@@ -246,20 +241,14 @@ function SpendingTypesSelect({
 	);
 }
 
-function ExpenseDatePicker({
-	inputConfig,
-}: {
-	inputConfig: FieldConfig<'date'>;
-}) {
-	const defaultDateValue = inputConfig.defaultValue
-		? new Date(inputConfig.defaultValue)
+function ExpenseDatePicker({ meta }: { meta: FieldMetadata<string> }) {
+	const defaultDateValue = meta.initialValue
+		? new Date(meta.initialValue)
 		: undefined;
 
 	const [date, setDate] = useState<Date | undefined>(defaultDateValue);
 	const shadowInputRef = useRef<HTMLInputElement>(null);
-	const control = useInputEvent({
-		ref: shadowInputRef,
-	});
+	const control = useInputControl(meta);
 
 	const onDateSelect = (value: Date | undefined) => {
 		setDate(value);
@@ -270,8 +259,8 @@ function ExpenseDatePicker({
 		<>
 			<input
 				ref={shadowInputRef}
-				{...conform.input(inputConfig, {
-					hidden: true,
+				{...getInputProps(meta, {
+					type: 'hidden',
 				})}
 			/>
 
@@ -312,7 +301,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	await validateCSRF(formData, request.headers);
 	checkHoneypot(formData);
 
-	const submission = await parse(formData, {
+	const submission = await parseWithZod(formData, {
 		schema: NewExpenseFormSchema.superRefine(async (data, ctx) => {
 			if (!data.id) return;
 
@@ -336,8 +325,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		async: true,
 	});
 
-	if (submission.intent !== 'submit') return json({ submission } as const);
-	if (!submission.value) return json({ submission } as const, { status: 400 });
+	if (submission.status !== 'success') {
+		return json(
+			{ result: submission.reply() },
+			{
+				status: submission.status === 'error' ? 400 : 200,
+			},
+		);
+	}
 
 	const { id: expenseId, typeId, value, date, comment } = submission.value;
 

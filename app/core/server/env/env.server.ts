@@ -49,6 +49,7 @@ export function init() {
 export function getEnv() {
 	return {
 		MODE: process.env.NODE_ENV,
+		MOCKS: process.env.MOCKS,
 		SENTRY_DSN: process.env.SENTRY_DSN,
 	};
 }

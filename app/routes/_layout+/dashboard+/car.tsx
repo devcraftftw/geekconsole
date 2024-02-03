@@ -1,5 +1,5 @@
-import { useForm } from '@conform-to/react';
-import { parse } from '@conform-to/zod';
+import { getFormProps, useForm } from '@conform-to/react';
+import { parseWithZod } from '@conform-to/zod';
 import { invariant, invariantResponse } from '@epic-web/invariant';
 import { type SEOHandle } from '@nasa-gcn/remix-seo';
 import { createId } from '@paralleldrive/cuid2';
@@ -124,18 +124,18 @@ export function DeleteExpense({ id }: { id: string }) {
 	const isPending = useIsPending();
 	const [form] = useForm({
 		id: 'deleteExpense',
-		lastSubmission: actionData?.submission,
+		lastResult: actionData?.result,
 	});
 
 	const submit = (event: FormEvent<HTMLFormElement>) => {
-		form.props.onSubmit(event);
+		form.onSubmit(event);
 
 		// dirty hack to programatically close dropdown after item removal
 		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	};
 
 	return (
-		<Form method="POST" {...form.props} onSubmit={submit}>
+		<Form method="POST" {...getFormProps(form)} onSubmit={submit}>
 			<AuthenticityTokenInput />
 			<input type="hidden" name="expenseId" value={id} />
 
@@ -144,7 +144,7 @@ export function DeleteExpense({ id }: { id: string }) {
 				name="intent"
 				value={DELETE_EXPENSE_INTENT}
 				variant="destructive"
-				status={isPending ? 'pending' : actionData?.status ?? 'idle'}
+				status={isPending ? 'pending' : form.status ?? 'idle'}
 				disabled={isPending}
 				className="w-full max-md:aspect-square max-md:px-0"
 			>
@@ -378,16 +378,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 	await validateCSRF(formData, request.headers);
 
-	const submission = parse(formData, {
+	const submission = parseWithZod(formData, {
 		schema: DeleteExpenseFormSchema,
 	});
 
-	if (submission.intent !== 'submit') {
-		return json({ status: 'idle', submission } as const);
-	}
-
-	if (!submission.value) {
-		return json({ status: 'error', submission } as const, { status: 400 });
+	if (submission.status !== 'success') {
+		return json(
+			{ result: submission.reply() },
+			{
+				status: submission.status === 'error' ? 400 : 200,
+			},
+		);
 	}
 
 	const { expenseId } = submission.value;
