@@ -149,6 +149,27 @@ async function seed() {
 		primaryEmailAddress: 'volodya@gk.dev',
 	});
 
+	// ------------- Book reading statuses -------------
+
+	const wantToRead = await prisma.bookReadingStatus.findFirstOrThrow({
+		select: { id: true },
+		where: { name: 'Want to read' },
+	});
+
+	const reading = await prisma.bookReadingStatus.findFirstOrThrow({
+		select: { id: true },
+		where: { name: 'Reading' },
+	});
+
+	const haveRead = await prisma.bookReadingStatus.findFirstOrThrow({
+		select: { id: true },
+		where: { name: 'Have read' },
+	});
+
+	// ------------- Book reading statuses -------------
+
+	// ------------- Car Spendings -------------
+
 	const fuelType = await prisma.carSpendingType.findFirstOrThrow({
 		select: { id: true },
 		where: { name: 'Fuel' },
@@ -163,6 +184,8 @@ async function seed() {
 		select: { id: true },
 		where: { name: 'New purchase' },
 	});
+
+	// ------------- Car Spendings -------------
 
 	await prisma.user.create({
 		select: { id: true },
@@ -205,7 +228,7 @@ async function seed() {
 						title: 'My best book',
 						author: 'Volodya',
 						year: 2022,
-						readingStatus: 'want to read',
+						statusId: reading.id,
 						description: 'My best book ever',
 						comment: 'My best book ever for real',
 						images: {
@@ -217,7 +240,7 @@ async function seed() {
 						title: 'My best book2',
 						author: 'Volodya',
 						year: 2022,
-						readingStatus: 'want to read',
+						statusId: haveRead.id,
 						description: 'My best book ever',
 						comment: 'My best book ever for real',
 						images: {
@@ -229,7 +252,7 @@ async function seed() {
 						title: 'My best book3',
 						author: 'Volodya',
 						year: 2022,
-						readingStatus: 'want to read',
+						statusId: wantToRead.id,
 						description: 'My best book ever',
 						comment: 'My best book ever for real',
 						images: {
@@ -241,7 +264,7 @@ async function seed() {
 						title: 'My best book4',
 						author: 'Volodya',
 						year: 2022,
-						readingStatus: 'want to read',
+						statusId: wantToRead.id,
 						description: 'My best book ever',
 						comment: 'My best book ever for real',
 						images: {

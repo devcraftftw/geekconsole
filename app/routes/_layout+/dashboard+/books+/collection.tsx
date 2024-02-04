@@ -50,8 +50,8 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 	getSitemapEntries: () => null,
 };
 
-type BookPreviewWithImgs = Pick<Book, 'id' | 'title' | 'readingStatus'> & {
-	status: { id: string; name: string } | null;
+type BookPreviewWithImgs = Pick<Book, 'id' | 'title'> & {
+	status: { name: string };
 } & {
 	imageId: Pick<BookImage, 'id'>['id'] | null;
 };
@@ -59,9 +59,8 @@ type BookPreviewWithImgs = Pick<Book, 'id' | 'title' | 'readingStatus'> & {
 const BooksSearchResultSchema = z.object({
 	id: z.string(),
 	title: z.string(),
-	readingStatus: z.string(),
-	statusId: z.string().nullable(),
-	statusName: z.string().nullable(),
+	statusId: z.string(),
+	statusName: z.string(),
 	imageId: z.string().nullable(),
 });
 const BooksSearchResultsSchema = z.array(BooksSearchResultSchema);
@@ -77,10 +76,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 			select: {
 				id: true,
 				title: true,
-				readingStatus: true,
 				status: {
 					select: {
-						id: true,
 						name: true,
 					},
 				},
@@ -116,7 +113,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 			SELECT 
 				Book.id, 
 				Book.title, 
-				Book.readingStatus, 
 				Book.statusId AS statusId,
 				BookReadingStatus.name AS statusName,
 				(
@@ -144,10 +140,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 		const mappedBooks = result.data.map((book) => {
 			const { statusId, statusName, ...rest } = book;
 
-			const status =
-				book.statusId && book.statusName
-					? { id: book.statusId, name: book.statusName }
-					: null;
+			const status = { id: book.statusId, name: book.statusName };
 
 			return {
 				...rest,
@@ -249,7 +242,7 @@ export function SearchBooksBar({
 export const BookCard = ({
 	book,
 }: SerializeFrom<{ book: BookPreviewWithImgs }>) => {
-	const { id, title, readingStatus, status, imageId } = book;
+	const { id, title, status, imageId } = book;
 
 	return (
 		<Card className="flex flex-col items-center">
@@ -262,9 +255,7 @@ export const BookCard = ({
 					src={getBookImgSrc(imageId)}
 					alt={book.title}
 				/>
-				<Badge variant="outline">
-					{status?.name ? status.name : readingStatus}
-				</Badge>
+				<Badge variant="outline">{status.name}</Badge>
 			</CardContent>
 			<CardFooter className="flex flex-col gap-2">
 				<Button asChild variant="link">

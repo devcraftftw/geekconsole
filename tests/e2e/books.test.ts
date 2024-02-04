@@ -113,7 +113,6 @@ async function createBook() {
 		author: faker.person.fullName(),
 		year: 2023,
 		statusId: readingStatus.id,
-		readingStatus: 'want to read',
 		description: faker.lorem.paragraph(),
 		comment: faker.lorem.paragraph(),
 	} satisfies Omit<Book, 'id' | 'createdAt' | 'updatedAt' | 'ownerId'>;

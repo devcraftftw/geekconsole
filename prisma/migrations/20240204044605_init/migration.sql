@@ -33,13 +33,22 @@ CREATE TABLE "Book" (
     "title" TEXT NOT NULL,
     "author" TEXT NOT NULL,
     "year" INTEGER NOT NULL,
-    "readingStatus" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT,
     "comment" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     "ownerId" TEXT NOT NULL,
-    CONSTRAINT "Book_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "statusId" TEXT NOT NULL,
+    CONSTRAINT "Book_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Book_statusId_fkey" FOREIGN KEY ("statusId") REFERENCES "BookReadingStatus" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "BookReadingStatus" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
 );
 
 -- CreateTable
@@ -163,7 +172,13 @@ CREATE UNIQUE INDEX "UserImage_userId_key" ON "UserImage"("userId");
 CREATE INDEX "Book_ownerId_idx" ON "Book"("ownerId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "BookReadingStatus_name_key" ON "BookReadingStatus"("name");
+
+-- CreateIndex
 CREATE INDEX "BookImage_bookId_idx" ON "BookImage"("bookId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "CarSpendingType_name_key" ON "CarSpendingType"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Permission_action_entity_access_key" ON "Permission"("action", "entity", "access");
@@ -203,6 +218,10 @@ INSERT INTO Role VALUES('clrofzp2i000pwn3ruid150ug','user','',1705898617003,1705
 INSERT INTO CarSpendingType VALUES('clrofzp2j000qwn3rgbkaj7dw','Fuel',1705898617004,1705898617004);
 INSERT INTO CarSpendingType VALUES('clrofzp2k000rwn3rbcaogcvf','Repair',1705898617004,1705898617004);
 INSERT INTO CarSpendingType VALUES('clrofzp2k000swn3re3znr4d1','New purchase',1705898617004,1705898617004);
+
+INSERT INTO BookReadingStatus VALUES('cls63g0690000jp6fjm020nvv','Want to read',1706965934049,1706965934049);
+INSERT INTO BookReadingStatus VALUES('cls63g06b0001jp6fwk185ipa','Reading',1706965934052,1706965934052);
+INSERT INTO BookReadingStatus VALUES('cls63g06c0002jp6fwkekuzne','Have read',1706965934052,1706965934052);
 
 INSERT INTO Permission VALUES('clrofzp1u0000wn3rcotncfi0','create','user','own','',1705898616978,1705898616978);
 INSERT INTO Permission VALUES('clrofzp1y0001wn3r022totmr','create','user','any','',1705898616983,1705898616983);

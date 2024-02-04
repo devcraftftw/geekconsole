@@ -53,7 +53,7 @@ import {
 type CleanBook = Omit<
 	Book,
 	'createdAt' | 'updatedAt' | 'ownerId' | 'statusId'
-> & { status: { id: string; name: string } | null };
+> & { status: { name: string } };
 
 type ReadingStatuses = Pick<BookReadingStatus, 'id' | 'name'>[];
 
@@ -202,7 +202,6 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
 			statusId,
 			description,
 			comment,
-			readingStatus: statusId,
 			images: { create: newImages },
 		},
 		update: {
@@ -212,7 +211,6 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
 			statusId,
 			description,
 			comment,
-			readingStatus: statusId,
 			images: {
 				deleteMany: { id: { notIn: imageUpdates.map((i) => i.id) } },
 				updateMany: imageUpdates.map((updates) => ({
@@ -247,10 +245,6 @@ export default function BookEditor({
 	const isSubmitting = useSubmitting();
 	const showSpinner = useSpinDelay(isSubmitting);
 
-	const oldReadingStatusValue = book?.readingStatus
-		? book?.readingStatus.charAt(0).toUpperCase() + book?.readingStatus.slice(1)
-		: undefined;
-
 	const [form, fields] = useForm({
 		id: 'bookEditor',
 		constraint: getZodConstraint(BookFormSchema),
@@ -264,9 +258,7 @@ export default function BookEditor({
 		},
 		defaultValue: {
 			...book,
-			statusName: book?.status?.name
-				? book?.status?.name
-				: oldReadingStatusValue,
+			statusName: book?.status.name,
 			images: book?.images ?? [{}],
 		},
 	});

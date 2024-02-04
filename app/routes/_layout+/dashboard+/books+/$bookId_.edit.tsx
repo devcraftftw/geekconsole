@@ -34,10 +34,8 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 			title: true,
 			author: true,
 			year: true,
-			readingStatus: true,
 			status: {
 				select: {
-					id: true,
 					name: true,
 				},
 			},
