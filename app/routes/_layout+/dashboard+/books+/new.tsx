@@ -1,7 +1,7 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo';
 import { type LoaderFunctionArgs, json } from '@remix-run/node';
-import { type MetaFunction } from '@remix-run/react';
-import { requireUserId } from '~/app/core/server';
+import { useLoaderData, type MetaFunction } from '@remix-run/react';
+import { prisma, requireUserId } from '~/app/core/server';
 import { type BreadcrumbHandle } from '~/app/shared/schemas';
 import BookEditor, { action } from './__book-editor';
 
@@ -19,8 +19,17 @@ export const meta: MetaFunction = () => {
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	await requireUserId(request);
-	return json({});
+
+	const readingStatuses = await prisma.bookReadingStatus.findMany({
+		select: { id: true, name: true },
+	});
+
+	return json({ readingStatuses });
 }
 
 export { action };
-export default BookEditor;
+
+export default function NewBookRoute() {
+	const data = useLoaderData<typeof loader>();
+	return <BookEditor readingStatuses={data.readingStatuses} />;
+}

@@ -1,3 +1,4 @@
+import { invariant } from '@epic-web/invariant';
 import { faker } from '@faker-js/faker';
 import { type Book } from '@prisma/client';
 import { prisma } from '~/app/core/server/index.ts';
@@ -6,7 +7,7 @@ import { expect, test } from '../playwright-utils.ts';
 test('Search from books collection', async ({ page, login }) => {
 	const user = await login();
 
-	const books = createBooks();
+	const books = await createBooks();
 
 	const firstBookTitle = books[0].title;
 	const secondBookTitle = books[1].title;
@@ -62,13 +63,18 @@ test('Search from books collection', async ({ page, login }) => {
 	await expect(page.getByText(/no books found/i)).toBeVisible();
 });
 
-function createBooks() {
+async function createBooks() {
+	const readingStatuses = await prisma.bookReadingStatus.findMany({
+		select: { id: true },
+	});
+	invariant(readingStatuses, 'Reading status must be defined');
+
 	return [
 		{
 			title: 'testTitle1',
 			author: 'testAuthor1',
 			year: 2023,
-			readingStatus: 'want to read',
+			statusId: readingStatuses[0].id,
 			description: faker.lorem.paragraph(),
 			comment: faker.lorem.paragraph(),
 		},
@@ -76,7 +82,7 @@ function createBooks() {
 			title: 'testTitle2',
 			author: 'testAuthor2',
 			year: 2023,
-			readingStatus: 'want to read',
+			statusId: readingStatuses[1].id,
 			description: faker.lorem.paragraph(),
 			comment: faker.lorem.paragraph(),
 		},

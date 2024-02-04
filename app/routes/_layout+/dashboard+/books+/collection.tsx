@@ -50,17 +50,107 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 	getSitemapEntries: () => null,
 };
 
-type BookPreviewWithImgs = Pick<Book, 'id' | 'title' | 'readingStatus'> & {
+type BookPreviewWithImgs = Pick<Book, 'id' | 'title'> & {
+	status: { name: string };
+} & {
 	imageId: Pick<BookImage, 'id'>['id'] | null;
 };
 
 const BooksSearchResultSchema = z.object({
 	id: z.string(),
 	title: z.string(),
-	readingStatus: z.string(),
+	statusId: z.string(),
+	statusName: z.string(),
 	imageId: z.string().nullable(),
 });
 const BooksSearchResultsSchema = z.array(BooksSearchResultSchema);
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+	const userId = await requireUserId(request);
+
+	const searchParams = new URL(request.url).searchParams;
+	const searchTerm = searchParams.get('search');
+
+	if (!searchTerm) {
+		const usersBooks = await prisma.book.findMany({
+			select: {
+				id: true,
+				title: true,
+				status: {
+					select: {
+						name: true,
+					},
+				},
+				images: {
+					take: 1,
+					select: {
+						id: true,
+					},
+				},
+			},
+			orderBy: {
+				updatedAt: 'desc',
+			},
+			where: { ownerId: userId },
+		});
+
+		const mappedUsersBooks = usersBooks.map((book) => {
+			const { images, ...rest } = book;
+
+			const imageId = book.images.length ? book.images[0].id : null;
+
+			return {
+				...rest,
+				imageId,
+			};
+		});
+
+		return json({ status: 'idle', usersBooks: mappedUsersBooks } as const);
+	} else {
+		const like = `%${searchTerm}%`;
+
+		const rawBooks = await prisma.$queryRaw`
+			SELECT 
+				Book.id, 
+				Book.title, 
+				Book.statusId AS statusId,
+				BookReadingStatus.name AS statusName,
+				(
+					SELECT BookImage.id 
+					FROM BookImage 
+					WHERE BookImage.bookId = Book.id 
+					LIMIT 1
+				) AS imageId
+			FROM Book
+			LEFT JOIN BookReadingStatus ON Book.statusId = BookReadingStatus.id
+			WHERE (Book.title LIKE ${like} OR Book.author LIKE ${like})
+			AND Book.ownerId = ${userId}
+			ORDER BY Book.updatedAt DESC
+			LIMIT 10
+		`;
+
+		const result = BooksSearchResultsSchema.safeParse(rawBooks);
+
+		if (!result.success) {
+			return json({ status: 'error', error: result.error.message } as const, {
+				status: 400,
+			});
+		}
+
+		const mappedBooks = result.data.map((book) => {
+			const { statusId, statusName, ...rest } = book;
+
+			const status = { id: book.statusId, name: book.statusName };
+
+			return {
+				...rest,
+				status,
+			};
+		});
+
+		return json({ status: 'idle', usersBooks: mappedBooks } as const);
+	}
+};
 
 export default function BooksCollectionRoute() {
 	const data = useLoaderData<typeof loader>();
@@ -152,7 +242,7 @@ export function SearchBooksBar({
 export const BookCard = ({
 	book,
 }: SerializeFrom<{ book: BookPreviewWithImgs }>) => {
-	const { id, title, readingStatus, imageId } = book;
+	const { id, title, status, imageId } = book;
 
 	return (
 		<Card className="flex flex-col items-center">
@@ -165,7 +255,7 @@ export const BookCard = ({
 					src={getBookImgSrc(imageId)}
 					alt={book.title}
 				/>
-				<Badge variant="outline">{readingStatus}</Badge>
+				<Badge variant="outline">{status.name}</Badge>
 			</CardContent>
 			<CardFooter className="flex flex-col gap-2">
 				<Button asChild variant="link">
@@ -176,70 +266,6 @@ export const BookCard = ({
 			</CardFooter>
 		</Card>
 	);
-};
-
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-	const userId = await requireUserId(request);
-
-	const searchParams = new URL(request.url).searchParams;
-	const searchTerm = searchParams.get('search');
-
-	if (!searchTerm) {
-		const usersBooks = await prisma.book.findMany({
-			select: {
-				id: true,
-				title: true,
-				readingStatus: true,
-				images: {
-					take: 1,
-					select: {
-						id: true,
-					},
-				},
-			},
-			orderBy: {
-				updatedAt: 'desc',
-			},
-			where: { ownerId: userId },
-		});
-
-		const mappedUsersBooks = usersBooks.map(({ images, ...book }) => ({
-			...book,
-			imageId: images.length ? images[0].id : null,
-		}));
-
-		return json({ status: 'idle', usersBooks: mappedUsersBooks } as const);
-	} else {
-		const like = `%${searchTerm}%`;
-
-		const rawBooks = await prisma.$queryRaw`
-			SELECT 
-				Book.id, 
-				Book.title, 
-				Book.readingStatus, 
-				(
-					SELECT BookImage.id 
-					FROM BookImage 
-					WHERE BookImage.bookId = Book.id 
-					LIMIT 1
-				) AS imageId
-			FROM Book
-			WHERE (Book.title LIKE ${like} OR Book.author LIKE ${like})
-			AND Book.ownerId = ${userId}
-			ORDER BY Book.updatedAt DESC
-			LIMIT 10
-		`;
-
-		const result = BooksSearchResultsSchema.safeParse(rawBooks);
-
-		if (!result.success) {
-			return json({ status: 'error', error: result.error.message } as const, {
-				status: 400,
-			});
-		}
-
-		return json({ status: 'idle', usersBooks: result.data } as const);
-	}
 };
 
 export const ErrorBoundary = () => {
