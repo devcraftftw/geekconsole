@@ -100,7 +100,9 @@ export default function BookOverview() {
 					<div>
 						<h4 className="font-bold">Description</h4>
 						<p className="mb-3 font-light text-muted-foreground">
-							{book.description}
+							{book.description
+								? book.description
+								: 'Description is not provided.'}
 						</p>
 					</div>
 					<div>
@@ -110,7 +112,9 @@ export default function BookOverview() {
 						</p>
 					</div>
 
-					<Badge className="mb-3">{book.readingStatus}</Badge>
+					<Badge className="mb-3">
+						{book.status?.name ? book.status?.name : book.readingStatus}
+					</Badge>
 
 					<div className="flex gap-4">
 						<DeleteBook id={book.id} />
@@ -170,6 +174,12 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 			title: true,
 			author: true,
 			year: true,
+			status: {
+				select: {
+					id: true,
+					name: true,
+				},
+			},
 			readingStatus: true,
 			description: true,
 			comment: true,

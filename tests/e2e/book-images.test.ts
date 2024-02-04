@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { invariant } from '@epic-web/invariant';
 import { faker } from '@faker-js/faker';
 import { type Book, type BookImage } from '@prisma/client';
 import { prisma } from '~/app/core/server/index.ts';
@@ -9,7 +10,7 @@ test('Users can create a book with an image', async ({ page, login }) => {
 
 	await page.goto(`/dashboard/books`);
 
-	const newBook = createBook();
+	const newBook = await createBook();
 	const altText = `${newBook.title}/1`;
 
 	await page.getByRole('link', { name: 'add a new book' }).click();
@@ -49,7 +50,7 @@ test('Users can create a book with multiple images', async ({
 
 	await page.goto(`/dashboard/books`);
 
-	const newBook = createBook();
+	const newBook = await createBook();
 	const altText1 = `${newBook.title}/1`;
 	const altText2 = `${newBook.title}/2`;
 
@@ -93,10 +94,12 @@ test('Users can create a book with multiple images', async ({
 test('Users can edit book image', async ({ page, login }) => {
 	const user = await login();
 
+	const newBook = await createBookWithImage();
+
 	const book = await prisma.book.create({
 		select: { id: true, title: true },
 		data: {
-			...createBookWithImage(),
+			...newBook,
 			ownerId: user.id,
 		},
 	});
@@ -123,10 +126,12 @@ test('Users can edit book image', async ({ page, login }) => {
 test('Users can delete last book image', async ({ page, login }) => {
 	const user = await login();
 
+	const newBook = await createBookWithImage();
+
 	const book = await prisma.book.create({
 		select: { id: true, title: true },
 		data: {
-			...createBookWithImage(),
+			...newBook,
 			ownerId: user.id,
 		},
 	});
@@ -147,10 +152,12 @@ test('Users can delete last book image', async ({ page, login }) => {
 test('Users can delete book image', async ({ page, login }) => {
 	const user = await login();
 
+	const newBook = await createBookWithMultipleImages();
+
 	const book = await prisma.book.create({
 		select: { id: true, title: true },
 		data: {
-			...createBookWithMultipleImages(),
+			...newBook,
 			ownerId: user.id,
 		},
 	});
@@ -179,20 +186,28 @@ test('Users can delete book image', async ({ page, login }) => {
 	expect(countAfter).toEqual(countBefore - 1);
 });
 
-function createBook() {
+async function createBook() {
+	const readingStatus = await prisma.bookReadingStatus.findFirst({
+		select: { id: true },
+	});
+	invariant(readingStatus, 'Reading status must be defined');
+
 	return {
 		title: faker.lorem.sentence(),
 		author: faker.person.fullName(),
 		year: 2023,
+		statusId: readingStatus.id,
 		readingStatus: 'want to read',
 		description: faker.lorem.paragraph(),
 		comment: faker.lorem.paragraph(),
 	} satisfies Omit<Book, 'id' | 'createdAt' | 'updatedAt' | 'ownerId'>;
 }
 
-function createBookWithImage() {
+async function createBookWithImage() {
+	const newBook = await createBook();
+
 	return {
-		...createBook(),
+		...newBook,
 		images: {
 			create: {
 				contentType: 'image/png',
@@ -204,9 +219,11 @@ function createBookWithImage() {
 	};
 }
 
-function createBookWithMultipleImages() {
+async function createBookWithMultipleImages() {
+	const newBook = await createBook();
+
 	return {
-		...createBook(),
+		...newBook,
 		images: {
 			create: [
 				{

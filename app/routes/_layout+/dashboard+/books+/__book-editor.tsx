@@ -9,8 +9,13 @@ import {
 	getCollectionProps,
 } from '@conform-to/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
+import { invariant } from '@epic-web/invariant';
 import { createId as cuid } from '@paralleldrive/cuid2';
-import { type Book, type BookImage } from '@prisma/client';
+import {
+	type BookReadingStatus,
+	type Book,
+	type BookImage,
+} from '@prisma/client';
 import {
 	type SerializeFrom,
 	type LoaderFunctionArgs,
@@ -45,10 +50,14 @@ import {
 	RadioGroupItem,
 } from '~/app/shared/ui/index.ts';
 
-type CleanBook = Omit<Book, 'createdAt' | 'updatedAt' | 'ownerId'>;
+type CleanBook = Omit<
+	Book,
+	'createdAt' | 'updatedAt' | 'ownerId' | 'statusId'
+> & { status: { id: string; name: string } | null };
+
+type ReadingStatuses = Pick<BookReadingStatus, 'id' | 'name'>[];
 
 const MAX_UPLOAD_SIZE = 1024 * 1024 * 3; // 3MB
-const READING_STATUSES = ['want to read', 'reading', 'have read'];
 
 const ImageFieldsetSchema = z.object({
 	id: z.string().optional(),
@@ -86,7 +95,7 @@ const BookFormSchema = z.object({
 		.max(100, { message: 'Author name is too long' }),
 	year: z.number().positive(),
 	images: z.array(ImageFieldsetSchema).max(5).optional(),
-	readingStatus: z.string(),
+	statusName: z.string(),
 	description: z.string().optional(),
 	comment: z.string().optional(),
 });
@@ -117,9 +126,19 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
 					message: 'Book not found',
 				});
 			}
-		}).transform(async ({ images = [], ...data }) => {
+		}).transform(async ({ images = [], statusName, ...data }) => {
+			const readingStatuses = await prisma.bookReadingStatus.findMany({
+				select: { id: true, name: true },
+			});
+
+			const status = readingStatuses.find(
+				(status) => status.name === statusName,
+			);
+			invariant(status, 'Reading status must not be null or undefined');
+
 			return {
 				...data,
+				statusId: status.id,
 				imageUpdates: await Promise.all(
 					images.filter(imageHasId).map(async (i) => {
 						if (imageHasFile(i)) {
@@ -165,7 +184,7 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
 		title,
 		author,
 		year,
-		readingStatus,
+		statusId,
 		description,
 		comment,
 		newImages = [],
@@ -180,18 +199,20 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
 			title,
 			author,
 			year,
-			readingStatus,
+			statusId,
 			description,
 			comment,
+			readingStatus: statusId,
 			images: { create: newImages },
 		},
 		update: {
 			title,
 			author,
 			year,
-			readingStatus,
+			statusId,
 			description,
 			comment,
+			readingStatus: statusId,
 			images: {
 				deleteMany: { id: { notIn: imageUpdates.map((i) => i.id) } },
 				updateMany: imageUpdates.map((updates) => ({
@@ -211,8 +232,10 @@ export const loader = async (_: LoaderFunctionArgs) => {
 };
 
 export default function BookEditor({
+	readingStatuses,
 	book,
 }: {
+	readingStatuses: SerializeFrom<ReadingStatuses>;
 	book?: SerializeFrom<
 		CleanBook & {
 			images: Array<Pick<BookImage, 'id' | 'altText'>>;
@@ -223,6 +246,10 @@ export default function BookEditor({
 
 	const isSubmitting = useSubmitting();
 	const showSpinner = useSpinDelay(isSubmitting);
+
+	const oldReadingStatusValue = book?.readingStatus
+		? book?.readingStatus.charAt(0).toUpperCase() + book?.readingStatus.slice(1)
+		: undefined;
 
 	const [form, fields] = useForm({
 		id: 'bookEditor',
@@ -237,6 +264,9 @@ export default function BookEditor({
 		},
 		defaultValue: {
 			...book,
+			statusName: book?.status?.name
+				? book?.status?.name
+				: oldReadingStatusValue,
 			images: book?.images ?? [{}],
 		},
 	});
@@ -326,7 +356,10 @@ export default function BookEditor({
 							</div>
 
 							{/* READING STATUS */}
-							<ReadingStatusRadioGroup meta={fields.readingStatus} />
+							<ReadingStatusRadioGroup
+								meta={fields.statusName}
+								readingStatuses={readingStatuses}
+							/>
 
 							{/* Comments */}
 							<div>
@@ -395,9 +428,17 @@ export default function BookEditor({
 	);
 }
 
-const ReadingStatusRadioGroup = ({ meta }: { meta: FieldMetadata<string> }) => {
+const ReadingStatusRadioGroup = ({
+	meta,
+	readingStatuses,
+}: {
+	meta: FieldMetadata<string>;
+	readingStatuses: ReadingStatuses;
+}) => {
 	const control = useInputControl(meta);
 	const radioGroupRef = useRef<ElementRef<typeof RadioGroup>>(null);
+
+	const readingStatusesNames = readingStatuses.map((status) => status.name);
 
 	return (
 		<div>
@@ -418,11 +459,11 @@ const ReadingStatusRadioGroup = ({ meta }: { meta: FieldMetadata<string> }) => {
 				onValueChange={control.change}
 				ref={radioGroupRef}
 				onBlur={control.blur}
-				className="flex space-y-1"
+				className="mt-2 flex"
 			>
 				{getCollectionProps(meta, {
 					type: 'radio',
-					options: READING_STATUSES,
+					options: readingStatusesNames,
 				}).map((props) => (
 					<div
 						key={props.value}

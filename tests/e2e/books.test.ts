@@ -1,3 +1,4 @@
+import { invariant } from '@epic-web/invariant';
 import { faker } from '@faker-js/faker';
 import { type Book } from '@prisma/client';
 import { prisma } from '~/app/core/server/index.ts';
@@ -7,7 +8,7 @@ test('Users can create books', async ({ page, login }) => {
 	await login();
 	await page.goto(`/dashboard/books`);
 
-	const newBook = createBook();
+	const newBook = await createBook();
 
 	await page.getByRole('link', { name: /add a new book/i }).click();
 
@@ -36,9 +37,11 @@ test('Users can create books', async ({ page, login }) => {
 test('Users can edit books', async ({ page, login }) => {
 	const user = await login();
 
+	const newBook = await createBook();
+
 	const book = await prisma.book.create({
 		select: { id: true },
-		data: { ...createBook(), ownerId: user.id },
+		data: { ...newBook, ownerId: user.id },
 	});
 
 	await page.goto(`/dashboard/books/${book.id}`);
@@ -46,7 +49,7 @@ test('Users can edit books', async ({ page, login }) => {
 	// edit the book
 	await page.getByRole('link', { name: 'Edit', exact: true }).click();
 
-	const updatedBook = createBook();
+	const updatedBook = await createBook();
 
 	await page.getByRole('textbox', { name: 'title' }).fill(updatedBook.title);
 	await page.getByRole('textbox', { name: 'author' }).fill(updatedBook.author);
@@ -72,9 +75,11 @@ test('Users can edit books', async ({ page, login }) => {
 test('Users can delete books', async ({ page, login }) => {
 	const user = await login();
 
+	const newBook = await createBook();
+
 	const book = await prisma.book.create({
 		select: { id: true },
-		data: { ...createBook(), ownerId: user.id },
+		data: { ...newBook, ownerId: user.id },
 	});
 
 	await page.goto(`/dashboard/books/collection`);
@@ -97,11 +102,17 @@ test('Users can delete books', async ({ page, login }) => {
 	expect(countAfter).toEqual(countBefore - 1);
 });
 
-function createBook() {
+async function createBook() {
+	const readingStatus = await prisma.bookReadingStatus.findFirst({
+		select: { id: true },
+	});
+	invariant(readingStatus, 'Reading status must be defined');
+
 	return {
 		title: faker.lorem.sentence(),
 		author: faker.person.fullName(),
 		year: 2023,
+		statusId: readingStatus.id,
 		readingStatus: 'want to read',
 		description: faker.lorem.paragraph(),
 		comment: faker.lorem.paragraph(),
