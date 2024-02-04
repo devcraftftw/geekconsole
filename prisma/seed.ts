@@ -67,7 +67,7 @@ async function seed() {
 	});
 	console.timeEnd('👑 Created roles...');
 
-	console.time('🏎️ Created car spending types...');
+	console.time('🏎️  Created car spending types...');
 	await prisma.carSpendingType.create({
 		data: {
 			name: 'Fuel',
@@ -85,7 +85,27 @@ async function seed() {
 			name: 'New purchase',
 		},
 	});
-	console.timeEnd('🏎️ Created car spending types...');
+	console.timeEnd('🏎️  Created car spending types...');
+
+	console.time('📚 Created book reading statuses...');
+	await prisma.bookReadingStatus.create({
+		data: {
+			name: 'Want to read',
+		},
+	});
+
+	await prisma.bookReadingStatus.create({
+		data: {
+			name: 'Reading',
+		},
+	});
+
+	await prisma.bookReadingStatus.create({
+		data: {
+			name: 'Have read',
+		},
+	});
+	console.timeEnd('📚 Created book reading statuses...');
 
 	console.time(`🐨 Created user "volodya"`);
 

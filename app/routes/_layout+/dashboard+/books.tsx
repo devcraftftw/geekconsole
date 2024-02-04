@@ -58,5 +58,6 @@ export default function Books() {
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	await requireUserId(request);
+
 	return json({});
 };

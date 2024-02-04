@@ -24,6 +24,10 @@ export const meta: MetaFunction = () => {
 export async function loader({ params, request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request);
 
+	const readingStatuses = await prisma.bookReadingStatus.findMany({
+		select: { id: true, name: true },
+	});
+
 	const book = await prisma.book.findFirst({
 		select: {
 			id: true,
@@ -31,6 +35,12 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 			author: true,
 			year: true,
 			readingStatus: true,
+			status: {
+				select: {
+					id: true,
+					name: true,
+				},
+			},
 			description: true,
 			comment: true,
 			images: {
@@ -48,12 +58,12 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 	invariantResponse(book, 'Not found', { status: 404 });
 
-	return json({ book });
+	return json({ book, readingStatuses });
 }
 
-export default function BookEdit() {
+export default function BookEditRoute() {
 	const data = useLoaderData<typeof loader>();
-	return <BookEditor book={data.book} />;
+	return <BookEditor book={data.book} readingStatuses={data.readingStatuses} />;
 }
 
 export function ErrorBoundary() {
