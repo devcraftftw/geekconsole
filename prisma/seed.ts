@@ -32,6 +32,7 @@ async function seed() {
 	const entities = ['user', 'book', 'carSpending'];
 	const actions = ['create', 'read', 'update', 'delete'];
 	const accesses = ['own', 'any'] as const;
+
 	for (const entity of entities) {
 		for (const action of actions) {
 			for (const access of accesses) {
@@ -68,42 +69,48 @@ async function seed() {
 	console.timeEnd('👑 Created roles...');
 
 	console.time('🏎️  Created car spending types...');
-	await prisma.carSpendingType.create({
+	const fuelSpendingType = await prisma.carSpendingType.create({
 		data: {
 			name: 'Fuel',
 		},
+		select: { id: true },
 	});
 
-	await prisma.carSpendingType.create({
+	const repairSpendingType = await prisma.carSpendingType.create({
 		data: {
 			name: 'Repair',
 		},
+		select: { id: true },
 	});
 
-	await prisma.carSpendingType.create({
+	const newPurchaseSpendingType = await prisma.carSpendingType.create({
 		data: {
 			name: 'New purchase',
 		},
+		select: { id: true },
 	});
 	console.timeEnd('🏎️  Created car spending types...');
 
 	console.time('📚 Created book reading statuses...');
-	await prisma.bookReadingStatus.create({
+	const wantToRead = await prisma.bookReadingStatus.create({
 		data: {
 			name: 'Want to read',
 		},
+		select: { id: true },
 	});
 
-	await prisma.bookReadingStatus.create({
+	const reading = await prisma.bookReadingStatus.create({
 		data: {
 			name: 'Reading',
 		},
+		select: { id: true },
 	});
 
-	await prisma.bookReadingStatus.create({
+	const haveRead = await prisma.bookReadingStatus.create({
 		data: {
 			name: 'Have read',
 		},
+		select: { id: true },
 	});
 	console.timeEnd('📚 Created book reading statuses...');
 
@@ -149,44 +156,6 @@ async function seed() {
 		primaryEmailAddress: 'volodya@gk.dev',
 	});
 
-	// ------------- Book reading statuses -------------
-
-	const wantToRead = await prisma.bookReadingStatus.findFirstOrThrow({
-		select: { id: true },
-		where: { name: 'Want to read' },
-	});
-
-	const reading = await prisma.bookReadingStatus.findFirstOrThrow({
-		select: { id: true },
-		where: { name: 'Reading' },
-	});
-
-	const haveRead = await prisma.bookReadingStatus.findFirstOrThrow({
-		select: { id: true },
-		where: { name: 'Have read' },
-	});
-
-	// ------------- Book reading statuses -------------
-
-	// ------------- Car Spendings -------------
-
-	const fuelType = await prisma.carSpendingType.findFirstOrThrow({
-		select: { id: true },
-		where: { name: 'Fuel' },
-	});
-
-	const repairType = await prisma.carSpendingType.findFirstOrThrow({
-		select: { id: true },
-		where: { name: 'Repair' },
-	});
-
-	const newPurchaseType = await prisma.carSpendingType.findFirstOrThrow({
-		select: { id: true },
-		where: { name: 'New purchase' },
-	});
-
-	// ------------- Car Spendings -------------
-
 	await prisma.user.create({
 		select: { id: true },
 		data: {
@@ -202,19 +171,19 @@ async function seed() {
 			carSpendings: {
 				create: [
 					{
-						typeId: fuelType.id,
+						typeId: fuelSpendingType.id,
 						date: new Date(),
 						value: 1000,
 						comment: 'Перед баней заправился',
 					},
 					{
-						typeId: repairType.id,
+						typeId: repairSpendingType.id,
 						date: new Date(2023, 6, 2),
 						value: 500,
 						comment: 'Поменял масло',
 					},
 					{
-						typeId: newPurchaseType.id,
+						typeId: newPurchaseSpendingType.id,
 						date: new Date(2024, 0, 6),
 						value: 3000,
 						comment: 'Новые дворники',
