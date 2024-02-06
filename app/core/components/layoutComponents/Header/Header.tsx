@@ -5,7 +5,7 @@ import { userHasRole } from '~/app/core/utils/index.ts';
 import { type loader as rootLoader } from '~/app/root.tsx';
 import { useOptionalUser, useTheme } from '~/app/shared/lib/hooks/index.ts';
 import { cn } from '~/app/shared/lib/utils/index.ts';
-import { Button, Icon } from '~/app/shared/ui/index.ts';
+import { BigLogo, Button, Icon } from '~/app/shared/ui/index.ts';
 import { ThemeSwitcher, UserNav } from './components/index.ts';
 
 const SCROLL_OFFSET = 50;
@@ -49,11 +49,7 @@ export const Header = () => {
 					<div className="flex flex-row items-center justify-between">
 						<div className="flex items-center">
 							<Link to="/" prefetch="intent">
-								<img
-									className="h-12 w-auto"
-									src={`/images/${isDark ? 'gk-logo-dark' : 'gk-logo-light'}.png`}
-									alt="Header logo"
-								/>
+								<BigLogo isDark={isDark} />
 							</Link>
 						</div>
 						<div className="flex items-center justify-center gap-4">
