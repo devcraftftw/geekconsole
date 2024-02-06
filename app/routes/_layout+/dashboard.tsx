@@ -8,9 +8,10 @@ import {
 } from '@remix-run/react';
 import { Fragment } from 'react';
 import { z } from 'zod';
+import { useTheme } from '~/app/shared/lib/hooks';
 import { cn } from '~/app/shared/lib/utils/index.ts';
 import { BreadcrumbHandle } from '~/app/shared/schemas/index.ts';
-import { Icon } from '~/app/shared/ui/index.ts';
+import { Icon, SmallLogo } from '~/app/shared/ui/index.ts';
 
 export const meta: MetaFunction = () => {
 	return [
@@ -49,9 +50,11 @@ const BreadcrumbHandleMatch = z.object({
 	handle: BreadcrumbHandle,
 });
 
-export default function Dashboard() {
-	const matches = useMatches();
+export default function DashboardRoute() {
+	const theme = useTheme();
+	const isDark = theme === 'dark';
 
+	const matches = useMatches();
 	const breadcrumbs = matches
 		.map((m) => {
 			const result = BreadcrumbHandleMatch.safeParse(m);
@@ -75,7 +78,8 @@ export default function Dashboard() {
 							className="flex items-center gap-2 font-semibold"
 							to="/dashboard"
 						>
-							<Icon name="skull">Dashboard</Icon>
+							<SmallLogo isDark={isDark} />
+							<span>Dashboard</span>
 						</Link>
 					</div>
 					<div className="flex-1 overflow-auto py-2">

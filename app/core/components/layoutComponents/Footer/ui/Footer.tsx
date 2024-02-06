@@ -1,6 +1,6 @@
 import { Link } from '@remix-run/react';
 import { useTheme } from '~/app/shared/lib/hooks/index.ts';
-import { Button } from '~/app/shared/ui/index.ts';
+import { BigLogo, Button } from '~/app/shared/ui/index.ts';
 
 export const Footer = () => {
 	const theme = useTheme();
@@ -13,11 +13,7 @@ export const Footer = () => {
 					<div className="xl:grid xl:grid-cols-5 xl:gap-8">
 						<div className="space-y-6 xl:col-span-2">
 							<Link to="/">
-								<img
-									className="h-8 w-auto"
-									src={`/images/gk-logo-${isDark ? 'dark' : 'light'}.png`}
-									alt="Footer logo"
-								/>
+								<BigLogo className="w-72" isDark={isDark} />
 							</Link>
 							<p className="max-w-xs text-sm">Stay organized or whatever</p>
 						</div>
