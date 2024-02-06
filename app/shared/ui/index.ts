@@ -27,3 +27,4 @@ export * from './Popover/Popover.tsx';
 export * from './DataTable/DataTable.tsx';
 export * from './Separator/Separator.tsx';
 export * from './Command/Command.tsx';
+export * from './Logo/Logo.tsx';
