@@ -61,8 +61,8 @@ export const links: LinksFunction = () =>
 		cssBundleHref ? { rel: 'preload', href: cssBundleHref, as: 'style' } : null,
 		{
 			rel: 'icon',
-			type: 'image/ico',
-			href: '/favicon.ico',
+			type: 'image/svg+xml',
+			href: 'favicons/favicon_bl.svg',
 		},
 		{
 			rel: 'stylesheet',
