@@ -75,12 +75,14 @@
           ghcr.io/${{ github.repository }}-stable
   
     gitops-pr:
+      permissions: write-all
       name: Call GitOps PR
       if: github.event_name == 'push'
       needs: docker-build-merge
       uses: devcraftftw/actions/.github/workflows/reusable-gitops-pr.yml@main
       secrets:
-        github-token: ${{ secrets.GITOPS_GEEKCONSOLE_K8S }}
+        # github-token: ${{ secrets.GITOPS_GEEKCONSOLE_K8S }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         slack-token: ${{ secrets.SLACK_BOT_TOKEN }}
       with:
         repo: devcraftftw/geekconsole-k8s
