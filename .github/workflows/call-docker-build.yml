@@ -34,11 +34,10 @@
         dockerhub-enable: false
         ghcr-enable: true
         push: true
-        platforms: linux/amd64,linux/arm64
+        # platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
         tag-rules: |
-          type=raw,value=stable-{{date 'YYYYMMDD'}}-{{sha}},enable=true,priority=300
           type=ref,event=tag,priority=200
-          type=raw,value=latest,enable=true,priority=100
           type=raw,value=gha-${{ github.run_id }},enable=${{github.event_name == 'pull_request'}},priority=200
           type=ref,event=pr,priority=100
         image-names: |
@@ -64,14 +63,12 @@
         dockerhub-enable: false
         ghcr-enable: true
         push: true
-        platforms: linux/amd64,linux/arm64
+        # platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
         tag-rules: |
-          type=raw,value=stable-{{date 'YYYYMMDD'}}-{{sha}},enable=true,priority=300
+          type=raw,value={{date 'YYYYMMDD'}}-{{sha}},enable=true,priority=300
           type=ref,event=tag,priority=200
-          type=raw,value=latest,enable=true,priority=100
-          type=raw,value=gha-${{ github.run_id }},enable=${{github.event_name == 'pull_request'}},priority=200
         image-names: |
-          ghcr.io/${{ github.repository }}
           ghcr.io/${{ github.repository }}-stable
   
     gitops-pr:
@@ -82,7 +79,6 @@
       uses: devcraftftw/actions/.github/workflows/reusable-gitops-pr.yml@main
       secrets:
         github-token: ${{ secrets.GITOPS_GEEKCONSOLE_K8S }}
-        # github-token: ${{ secrets.GITHUB_TOKEN }}
         slack-token: ${{ secrets.SLACK_BOT_TOKEN }}
       with:
         repo: devcraftftw/geekconsole-k8s
