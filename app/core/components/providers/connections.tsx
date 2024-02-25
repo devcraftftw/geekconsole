@@ -1,7 +1,7 @@
 import { Form } from '@remix-run/react';
 import { z } from 'zod';
-import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
-import { Icon, StatusButton } from '~/app/shared/ui/index.ts';
+import { useIsPending } from '#app/shared/lib/hooks/index.ts';
+import { Icon, StatusButton } from '#app/shared/ui/index.ts';
 
 export const GITHUB_PROVIDER_NAME = 'github';
 // to add another provider, set their name here and add it to the providerNames below

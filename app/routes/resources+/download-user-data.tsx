@@ -1,6 +1,7 @@
 import { json, type LoaderFunctionArgs } from '@remix-run/node';
-import { prisma, requireUserId } from '~/app/core/server/index.ts';
-import { getDomainUrl } from '~/app/shared/lib/utils/index.ts';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server';
+import { prisma } from '#app/core/server-utils/db/db.server';
+import { getDomainUrl } from '#app/shared/lib/utils/index.ts';
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request);
@@ -47,7 +48,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 				? {
 						...user.image,
 						url: `${domain}/resources/user-images/${user.image.id}`,
-				  }
+					}
 				: null,
 			books: user.books.map((book) => ({
 				...book,

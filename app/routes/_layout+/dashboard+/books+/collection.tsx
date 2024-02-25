@@ -15,11 +15,12 @@ import {
 } from '@remix-run/react';
 import { useId } from 'react';
 import { z } from 'zod';
-import { requireUserId, prisma } from '~/app/core/server/index.ts';
-import { useDebounce, useIsPending } from '~/app/shared/lib/hooks';
-import { useDelayedIsPending } from '~/app/shared/lib/hooks/useDelayedIsPending/useDelayedIsPending';
-import { cn, getBookImgSrc } from '~/app/shared/lib/utils';
-import { type BreadcrumbHandle } from '~/app/shared/schemas/index.ts';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server';
+import { prisma } from '#app/core/server-utils/db/db.server';
+import { useDebounce, useIsPending } from '#app/shared/lib/hooks';
+import { useDelayedIsPending } from '#app/shared/lib/hooks/useDelayedIsPending/useDelayedIsPending';
+import { cn, getBookImgSrc } from '#app/shared/lib/utils';
+import { type BreadcrumbHandle } from '#app/shared/schemas/index.ts';
 import {
 	GeneralErrorBoundary,
 	Alert,
@@ -36,7 +37,7 @@ import {
 	Label,
 	StatusButton,
 	ErrorList,
-} from '~/app/shared/ui/index.ts';
+} from '#app/shared/ui/index.ts';
 
 export const meta: MetaFunction = () => {
 	return [
@@ -110,15 +111,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 		const like = `%${searchTerm}%`;
 
 		const rawBooks = await prisma.$queryRaw`
-			SELECT 
-				Book.id, 
-				Book.title, 
+			SELECT
+				Book.id,
+				Book.title,
 				Book.statusId AS statusId,
 				BookReadingStatus.name AS statusName,
 				(
-					SELECT BookImage.id 
-					FROM BookImage 
-					WHERE BookImage.bookId = Book.id 
+					SELECT BookImage.id
+					FROM BookImage
+					WHERE BookImage.bookId = Book.id
 					LIMIT 1
 				) AS imageId
 			FROM Book

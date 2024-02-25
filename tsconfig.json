@@ -1,11 +1,11 @@
 {
-	"include": ["**/*.ts", "**/*.tsx"],
+	"include": ["env.d.ts", "**/*.ts", "**/*.tsx"],
 	"compilerOptions": {
 		"lib": ["DOM", "DOM.Iterable", "ES2022"],
 		"isolatedModules": true,
 		"esModuleInterop": true,
 		"jsx": "react-jsx",
-		"module": "ES2022",
+		"module": "ESNext",
 		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
 		"target": "ES2022",
@@ -14,7 +14,7 @@
 		"allowJs": true,
 		"forceConsistentCasingInFileNames": true,
 		"paths": {
-			"~/*": ["./*"],
+			"#*": ["./*"],
 			"@/icon-name": [
 				"./app/shared/ui/Icons/name.d.ts",
 				"./types/icon-name.d.ts"

@@ -15,22 +15,24 @@ import {
 	useSubmit,
 } from '@remix-run/react';
 import {
+	searchCacheKeys,
+	getAllCacheKeys,
 	cache,
+	lruCache,
+} from '#app/core/server-utils/cache/cache.server';
+import {
 	ensureInstance,
 	getAllInstances,
 	getInstanceInfo,
-	lruCache,
-	requireUserWithRole,
-	searchCacheKeys,
-	getAllCacheKeys,
-} from '~/app/core/server/index.ts';
-import { useDebounce, useDoubleCheck } from '~/app/shared/lib/hooks/index.ts';
+} from '#app/core/server-utils/litefs/litefs.server';
+import { requireUserWithRole } from '#app/core/server-utils/permissions/permissions.server';
+import { useDebounce, useDoubleCheck } from '#app/shared/lib/hooks/index.ts';
 import {
 	Button,
 	Field,
 	GeneralErrorBoundary,
 	Spacer,
-} from '~/app/shared/ui/index.ts';
+} from '#app/shared/ui/index.ts';
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,

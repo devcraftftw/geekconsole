@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { extendTailwindMerge } from 'tailwind-merge';
-import { extendedTheme } from '~/app/core/utils/extendedTheme/extendedTheme.ts';
+import { extendedTheme } from '#app/core/client-utils/extendedTheme/extendedTheme.ts';
 
 function formatColors() {
 	const colors = [];

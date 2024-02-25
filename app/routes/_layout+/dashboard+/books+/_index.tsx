@@ -1,4 +1,4 @@
-import { useTheme } from '~/app/shared/lib/hooks';
+import { useTheme } from '#app/shared/lib/hooks';
 
 export default function BooksIndexRoute() {
 	return (

@@ -1,10 +1,10 @@
 import { invariantResponse } from '@epic-web/invariant';
 import { json, type LoaderFunctionArgs } from '@remix-run/node';
 import { Form, Link, useLoaderData, type MetaFunction } from '@remix-run/react';
-import { prisma } from '~/app/core/server';
-import { useOptionalUser } from '~/app/shared/lib/hooks';
-import { getUserImgSrc } from '~/app/shared/lib/utils';
-import { Spacer, Button, Icon, GeneralErrorBoundary } from '~/app/shared/ui';
+import { prisma } from '#app/core/server-utils/db/db.server';
+import { useOptionalUser } from '#app/shared/lib/hooks';
+import { getUserImgSrc } from '#app/shared/lib/utils';
+import { Spacer, Button, Icon, GeneralErrorBoundary } from '#app/shared/ui';
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	const user = await prisma.user.findFirst({

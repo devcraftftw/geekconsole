@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import { PrismaClient } from '@prisma/client';
 import { promiseHash } from 'remix-utils/promise';
-import { cleanupDb, createPassword } from '~/tests/db-utils.ts';
-import { insertGitHubUser } from '~/tests/mocks/github.ts';
+import { cleanupDb, createPassword } from '#tests/db-utils.ts';
+import { insertGitHubUser } from '#tests/mocks/github.ts';
 
 const prisma = new PrismaClient();
 

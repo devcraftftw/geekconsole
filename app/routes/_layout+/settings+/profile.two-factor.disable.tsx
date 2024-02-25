@@ -6,16 +6,14 @@ import {
 } from '@remix-run/node';
 import { useFetcher } from '@remix-run/react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
-import {
-	prisma,
-	redirectWithToast,
-	requireUserId,
-	validateCSRF,
-} from '~/app/core/server/index.ts';
-import { useDoubleCheck } from '~/app/shared/lib/hooks/index.ts';
-import { type BreadcrumbHandle } from '~/app/shared/schemas/index.ts';
-import { Icon, StatusButton } from '~/app/shared/ui/index.ts';
-import { requireRecentVerification } from '../_auth+/verify.tsx';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server.ts';
+import { validateCSRF } from '#app/core/server-utils/csrf/csrf.server.ts';
+import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { redirectWithToast } from '#app/core/server-utils/toast/toast.server.ts';
+import { useDoubleCheck } from '#app/shared/lib/hooks/index.ts';
+import { type BreadcrumbHandle } from '#app/shared/schemas/index.ts';
+import { Icon, StatusButton } from '#app/shared/ui/index.ts';
+import { requireRecentVerification } from '../_auth+/verify.server.ts';
 import { twoFAVerificationType } from './profile.two-factor.tsx';
 
 export const handle: BreadcrumbHandle & SEOHandle = {

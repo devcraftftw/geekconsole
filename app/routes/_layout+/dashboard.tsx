@@ -8,10 +8,10 @@ import {
 } from '@remix-run/react';
 import { Fragment } from 'react';
 import { z } from 'zod';
-import { useTheme } from '~/app/shared/lib/hooks';
-import { cn } from '~/app/shared/lib/utils/index.ts';
-import { BreadcrumbHandle } from '~/app/shared/schemas/index.ts';
-import { Icon, SmallLogo } from '~/app/shared/ui/index.ts';
+import { useTheme } from '#app/shared/lib/hooks';
+import { cn } from '#app/shared/lib/utils/index.ts';
+import { BreadcrumbHandle } from '#app/shared/schemas/index.ts';
+import { Icon, SmallLogo } from '#app/shared/ui/index.ts';
 
 export const meta: MetaFunction = () => {
 	return [

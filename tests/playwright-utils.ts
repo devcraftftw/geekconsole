@@ -5,9 +5,9 @@ import {
 	getPasswordHash,
 	getSessionExpirationDate,
 	SESSION_KEY,
-	authSessionStorage,
-	prisma,
-} from '~/app/core/server/index.ts';
+} from '#app/core/server-utils/auth/auth.server.ts';
+import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { authSessionStorage } from '#app/core/server-utils/session/session.server.ts';
 import { createUser } from './db-utils.ts';
 
 export * from './db-utils.ts';

@@ -7,10 +7,10 @@ import {
 	ProgressBar,
 	Confetti,
 	useToast,
-} from '~/app/core/components/layoutComponents/index.ts';
-import { type loader as rootLoader } from '~/app/root.tsx';
-import { useOptionalUser, useTheme } from '~/app/shared/lib/hooks/index.ts';
-import { GeekToaster } from '~/app/shared/ui';
+} from '#app/core/components/layoutComponents/index.ts';
+import { type loader as rootLoader } from '#app/root.tsx';
+import { useOptionalUser, useTheme } from '#app/shared/lib/hooks/index.ts';
+import { GeekToaster } from '#app/shared/ui';
 
 export default function Layout() {
 	const data = useRouteLoaderData<typeof rootLoader>('root');

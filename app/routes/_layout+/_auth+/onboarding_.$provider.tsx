@@ -1,16 +1,15 @@
 import {
-	type SubmissionResult,
 	getFormProps,
 	getInputProps,
 	useForm,
+	type SubmissionResult,
 } from '@conform-to/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
-import { invariant } from '@epic-web/invariant';
 import {
 	json,
 	redirect,
-	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
+	type LoaderFunctionArgs,
 	type MetaFunction,
 } from '@remix-run/node';
 import {
@@ -22,29 +21,28 @@ import {
 } from '@remix-run/react';
 import { safeRedirect } from 'remix-utils/safe-redirect';
 import { z } from 'zod';
-import { ProviderNameSchema } from '~/app/core/components/providers/index.ts';
+import { ProviderNameSchema } from '#app/core/components/providers/index.ts';
 import {
-	SESSION_KEY,
-	authSessionStorage,
-	authenticator,
-	prisma,
-	redirectWithConfetti,
 	requireAnonymous,
+	authenticator,
 	signupWithConnection,
-	verifySessionStorage,
-} from '~/app/core/server/index.ts';
-import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
-import { NameSchema, UsernameSchema } from '~/app/shared/schemas/index.ts';
+	SESSION_KEY,
+} from '#app/core/server-utils/auth/auth.server.ts';
+import { redirectWithConfetti } from '#app/core/server-utils/confetti/confetti.server.ts';
+import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { authSessionStorage } from '#app/core/server-utils/session/session.server.ts';
+import { verifySessionStorage } from '#app/core/server-utils/verification/verification.server.ts';
+import { useIsPending } from '#app/shared/lib/hooks/index.ts';
+import { NameSchema, UsernameSchema } from '#app/shared/schemas/index.ts';
 import {
 	CheckboxField,
 	ErrorList,
 	Field,
 	Spacer,
 	StatusButton,
-} from '~/app/shared/ui/index.ts';
-import { type VerifyFunctionArgs } from './verify.tsx';
+} from '#app/shared/ui/index.ts';
+import { ONBOARDING_EMAIL_SESSION_KEY } from './onboarding.tsx';
 
-export const ONBOARDING_EMAIL_SESSION_KEY = 'onboardingEmail';
 export const PROVIDER_ID_KEY = 'providerId';
 export const PREFILLED_PROFILE_KEY = 'prefilledProfile';
 
@@ -190,22 +188,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	);
 
 	return redirectWithConfetti(safeRedirect(redirectTo), { headers });
-}
-
-export async function handleVerification({ submission }: VerifyFunctionArgs) {
-	invariant(
-		submission.status === 'success',
-		'Submission should be successful by now',
-	);
-
-	const verifySession = await verifySessionStorage.getSession();
-	verifySession.set(ONBOARDING_EMAIL_SESSION_KEY, submission.value.target);
-
-	return redirect('/onboarding', {
-		headers: {
-			'set-cookie': await verifySessionStorage.commitSession(verifySession),
-		},
-	});
 }
 
 export default function SignupRoute() {

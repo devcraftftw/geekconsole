@@ -6,13 +6,8 @@ import {
 	getInputProps,
 } from '@conform-to/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
-import { createId } from '@paralleldrive/cuid2';
 import { type CarSpending } from '@prisma/client';
-import {
-	type ActionFunctionArgs,
-	type SerializeFrom,
-	json,
-} from '@remix-run/node';
+import { type SerializeFrom } from '@remix-run/node';
 import {
 	Form,
 	useActionData,
@@ -25,15 +20,8 @@ import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { HoneypotInputs } from 'remix-utils/honeypot/react';
 import { useSpinDelay } from 'spin-delay';
 import { z } from 'zod';
-import {
-	checkHoneypot,
-	prisma,
-	redirectWithToast,
-	requireUserId,
-	validateCSRF,
-} from '~/app/core/server';
-import { useSubmitting } from '~/app/shared/lib/hooks';
-import { cn, isIsoDate } from '~/app/shared/lib/utils';
+import { useSubmitting } from '#app/shared/lib/hooks';
+import { cn, isIsoDate } from '#app/shared/lib/utils';
 import {
 	Dialog,
 	DialogContent,
@@ -57,11 +45,12 @@ import {
 	Button,
 	ErrorList,
 	Field,
-} from '~/app/shared/ui';
+} from '#app/shared/ui';
 import { type loader as editRouteLoader } from './$expenseId_.edit';
+import { type action } from './__car-expense-editor.server';
 import { type loader as newRouteLoader } from './new';
 
-const NewExpenseFormSchema = z.object({
+export const NewExpenseFormSchema = z.object({
 	id: z.string().optional(),
 	date: z
 		.string({ required_error: 'A date is required' })
@@ -295,82 +284,3 @@ function ExpenseDatePicker({ meta }: { meta: FieldMetadata<string> }) {
 		</>
 	);
 }
-
-export const action = async ({ request }: ActionFunctionArgs) => {
-	const userId = await requireUserId(request);
-
-	const formData = await request.formData();
-
-	await validateCSRF(formData, request.headers);
-	checkHoneypot(formData);
-
-	const submission = await parseWithZod(formData, {
-		schema: NewExpenseFormSchema.superRefine(async (data, ctx) => {
-			if (!data.id) return;
-
-			const expense = await prisma.carSpending.findUnique({
-				select: { id: true },
-				where: { id: data.id, ownerId: userId },
-			});
-
-			if (!expense) {
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					message: 'Expense not found',
-				});
-			}
-		}).transform(async (data) => {
-			return {
-				...data,
-				date: new Date(data.date),
-			};
-		}),
-		async: true,
-	});
-
-	if (submission.status !== 'success') {
-		return json(
-			{ result: submission.reply() },
-			{
-				status: submission.status === 'error' ? 400 : 200,
-			},
-		);
-	}
-
-	const { id: expenseId, typeId, value, date, comment } = submission.value;
-
-	await prisma.carSpending.upsert({
-		select: { id: true },
-		where: { id: expenseId ?? '__new_expense__' },
-		create: {
-			typeId,
-			value,
-			date,
-			comment,
-			ownerId: userId,
-		},
-		update: {
-			typeId,
-			value,
-			date,
-			comment,
-			ownerId: userId,
-		},
-	});
-
-	if (expenseId) {
-		return redirectWithToast('/dashboard/car', {
-			id: createId(),
-			type: 'success',
-			title: 'Expense updated',
-			description: 'Expense has been updated',
-		});
-	} else {
-		return redirectWithToast('/dashboard/car', {
-			id: createId(),
-			type: 'success',
-			title: 'Expense added',
-			description: 'New expense has been added',
-		});
-	}
-};

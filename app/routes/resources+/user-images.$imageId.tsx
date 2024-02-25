@@ -1,6 +1,6 @@
 import { invariantResponse } from '@epic-web/invariant';
 import { type LoaderFunctionArgs } from '@remix-run/node';
-import { prisma } from '~/app/core/server/index.ts';
+import { prisma } from '#app/core/server-utils/db/db.server';
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	invariantResponse(params.imageId, 'Image ID is required', { status: 400 });

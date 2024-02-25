@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useSpinDelay } from 'spin-delay';
-import { cn } from '~/app/shared/lib/utils/index.ts';
+import { cn } from '#app/shared/lib/utils/index.ts';
 import { Button, type ButtonProps } from '../Button/Button.tsx';
 import { Icon } from '../Icons/Icon.tsx';
 import {

@@ -1,9 +1,12 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo';
 import { type LoaderFunctionArgs, json } from '@remix-run/node';
 import { useLoaderData, type MetaFunction } from '@remix-run/react';
-import { prisma, requireUserId } from '~/app/core/server';
-import { type BreadcrumbHandle } from '~/app/shared/schemas';
-import BookEditor, { action } from './__book-editor';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server.ts';
+import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { type BreadcrumbHandle } from '#app/shared/schemas';
+import BookEditor from './__book-editor';
+
+export { action } from './__book-editor.server';
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: 'New Book',
@@ -26,8 +29,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	return json({ readingStatuses });
 }
-
-export { action };
 
 export default function NewBookRoute() {
 	const data = useLoaderData<typeof loader>();

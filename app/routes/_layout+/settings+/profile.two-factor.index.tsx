@@ -1,3 +1,4 @@
+import { generateTOTP } from '@epic-web/totp';
 import {
 	json,
 	redirect,
@@ -6,14 +7,11 @@ import {
 } from '@remix-run/node';
 import { Link, Form, useLoaderData } from '@remix-run/react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
-import {
-	generateTOTP,
-	prisma,
-	requireUserId,
-	validateCSRF,
-} from '~/app/core/server/index.ts';
-import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
-import { Icon, StatusButton } from '~/app/shared/ui/index.ts';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server.ts';
+import { validateCSRF } from '#app/core/server-utils/csrf/csrf.server.ts';
+import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { useIsPending } from '#app/shared/lib/hooks/index.ts';
+import { Icon, StatusButton } from '#app/shared/ui/index.ts';
 import { twoFAVerificationType } from './profile.two-factor.tsx';
 import { twoFAVerifyVerificationType } from './profile.two-factor.verify.tsx';
 
