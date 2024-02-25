@@ -7,11 +7,11 @@ import { render, screen } from '@testing-library/react';
 import setCookieParser from 'set-cookie-parser';
 import { test } from 'vitest';
 import {
-	prisma,
 	getSessionExpirationDate,
-	authSessionStorage,
 	SESSION_KEY,
-} from '~/app/core/server';
+} from '~/app/core/server-utils/auth/auth.server';
+import { prisma } from '~/app/core/server-utils/db/db.server';
+import { authSessionStorage } from '~/app/core/server-utils/session/session.server';
 import { loader as rootLoader } from '~/app/root.tsx';
 import {
 	default as UsernameRoute,

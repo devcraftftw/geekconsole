@@ -1,6 +1,5 @@
 import { parseWithZod } from '@conform-to/zod';
 import { invariantResponse } from '@epic-web/invariant';
-import { cssBundleHref } from '@remix-run/css-bundle';
 import {
 	type HeadersFunction,
 	type LoaderFunctionArgs,
@@ -11,7 +10,6 @@ import {
 import {
 	type MetaFunction,
 	Links,
-	LiveReload,
 	Meta,
 	Outlet,
 	Scripts,
@@ -25,23 +23,25 @@ import { AuthenticityTokenProvider } from 'remix-utils/csrf/react';
 import { HoneypotProvider } from 'remix-utils/honeypot/react';
 import { href as iconsHref } from '~/app/shared/ui/Icons/Icon.tsx';
 import {
+	ClientHintCheck,
+	getHints,
+} from './core/client-utils/clientHints/clientHints.tsx';
+import { useNonce } from './core/client-utils/nonce/nonce.ts';
+import { getUserId, logout } from './core/server-utils/auth/auth.server.ts';
+import { getConfetti } from './core/server-utils/confetti/confetti.server.ts';
+import { csrf } from './core/server-utils/csrf/csrf.server.ts';
+import { prisma } from './core/server-utils/db/db.server.ts';
+import { getEnv } from './core/server-utils/env/env.server.ts';
+import { honeypot } from './core/server-utils/honeypot/honeypot.server.ts';
+import {
 	type Theme,
-	csrf,
-	getEnv,
-	honeypot,
 	setTheme,
 	getTheme,
-	prisma,
-	getToast,
-	getUserId,
-	makeTimings,
-	time,
-	logout,
-	getConfetti,
-} from './core/server/index.ts';
-import fonts from './core/styles/fonts.css';
-import twStyles from './core/styles/twStyles.css';
-import { ClientHintCheck, getHints, useNonce } from './core/utils/index.ts';
+} from './core/server-utils/theme/theme.server.ts';
+import { makeTimings, time } from './core/server-utils/timing/timing.server.ts';
+import { getToast } from './core/server-utils/toast/toast.server.ts';
+import fonts from './core/styles/fonts.css?url';
+import twStyles from './core/styles/twStyles.css?url';
 import { useTheme } from './shared/lib/hooks/index.ts';
 import { combineHeaders, getDomainUrl } from './shared/lib/utils/index.ts';
 import { ThemeFormSchema } from './shared/schemas/index.ts';
@@ -58,7 +58,6 @@ export const links: LinksFunction = () =>
 			as: 'style',
 		},
 		{ rel: 'preload', href: fonts, as: 'style' },
-		cssBundleHref ? { rel: 'preload', href: cssBundleHref, as: 'style' } : null,
 		{
 			rel: 'icon',
 			type: 'image/svg+xml',
@@ -69,7 +68,6 @@ export const links: LinksFunction = () =>
 			href: twStyles,
 		},
 		{ rel: 'stylesheet', href: fonts },
-		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
 	].filter(Boolean);
 
 export default withSentry(AppWithProviders);
@@ -127,7 +125,6 @@ function Document({
 
 				<ScrollRestoration nonce={nonce} />
 				<Scripts nonce={nonce} />
-				<LiveReload nonce={nonce} />
 			</body>
 		</html>
 	);

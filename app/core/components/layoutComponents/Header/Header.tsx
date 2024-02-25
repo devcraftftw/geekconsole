@@ -1,7 +1,7 @@
 import { Link, useRouteLoaderData } from '@remix-run/react';
 
 import { useEffect, useState } from 'react';
-import { userHasRole } from '~/app/core/utils/index.ts';
+import { userHasRole } from '~/app/core/client-utils/user/user.ts';
 import { type loader as rootLoader } from '~/app/root.tsx';
 import { useOptionalUser, useTheme } from '~/app/shared/lib/hooks/index.ts';
 import { cn } from '~/app/shared/lib/utils/index.ts';

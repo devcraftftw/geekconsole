@@ -1,5 +1,6 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
+import { getTOTPAuthUri } from '@epic-web/totp';
 import {
 	json,
 	redirect,
@@ -15,14 +16,11 @@ import {
 import * as QRCode from 'qrcode';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { z } from 'zod';
-import {
-	getTOTPAuthUri,
-	prisma,
-	redirectWithToast,
-	requireUserId,
-	validateCSRF,
-} from '~/app/core/server/index.ts';
-import { isCodeValid } from '~/app/routes/_layout+/_auth+/verify.tsx';
+import { requireUserId } from '~/app/core/server-utils/auth/auth.server.ts';
+import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server.ts';
+import { prisma } from '~/app/core/server-utils/db/db.server.ts';
+import { redirectWithToast } from '~/app/core/server-utils/toast/toast.server.ts';
+import { isCodeValid } from '~/app/routes/_layout+/_auth+/verify.server.ts';
 import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
 import { getDomainUrl } from '~/app/shared/lib/utils/index.ts';
 import { Field, Icon, StatusButton } from '~/app/shared/ui/index.ts';

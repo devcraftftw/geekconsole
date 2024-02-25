@@ -7,23 +7,20 @@ import {
 import { isbot } from 'isbot';
 import { RemixServer } from '@remix-run/react';
 import * as Sentry from '@sentry/remix';
-import { getInstanceInfo } from 'litefs-js';
 import { renderToPipeableStream } from 'react-dom/server';
-import { getEnv, init, makeTimings } from './core/server/index.ts';
-import { NonceProvider } from './core/utils/index.ts';
+import { getInstanceInfo } from 'litefs-js';
+import { initEnv, getEnv } from './core/server-utils/env/env.server.ts';
+import { makeTimings } from './core/server-utils/timing/timing.server.ts';
+import { NonceProvider } from './core/client-utils/nonce/nonce.ts';
 
 const ABORT_DELAY = 5000;
 
-init();
+initEnv();
 global.ENV = getEnv();
 
-if (
-	ENV.MODE === 'production' &&
-	process.env.MOCKS === 'false' &&
-	ENV.SENTRY_DSN
-) {
-	import('./core/server/monitoring/monitoring.server.ts').then(({ init }) =>
-		init(),
+if (ENV.MODE === 'production' && ENV.MOCKS === 'false' && ENV.SENTRY_DSN) {
+	import('./core/server-utils/monitoring/monitoring.server.ts').then(
+		({ init }) => init(),
 	);
 }
 

@@ -1,33 +1,23 @@
-import { useForm, getFormProps, getInputProps } from '@conform-to/react';
+import { getFormProps, getInputProps, useForm } from '@conform-to/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
-import { invariant } from '@epic-web/invariant';
 import {
-	type ActionFunctionArgs,
 	json,
-	redirect,
+	type ActionFunctionArgs,
 	type LoaderFunctionArgs,
 	type MetaFunction,
 } from '@remix-run/node';
 import { Form, Link, useActionData, useSearchParams } from '@remix-run/react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { HoneypotInputs } from 'remix-utils/honeypot/react';
-import { safeRedirect } from 'remix-utils/safe-redirect';
 import { z } from 'zod';
 import { ProviderConnectionForm } from '~/app/core/components/providers/index.ts';
 import {
-	SESSION_KEY,
-	authSessionStorage,
-	checkHoneypot,
-	getUserId,
-	login,
-	prisma,
-	redirectWithToast,
 	requireAnonymous,
-	validateCSRF,
-	verifySessionStorage,
-} from '~/app/core/server/index.ts';
+	login,
+} from '~/app/core/server-utils/auth/auth.server.ts';
+import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server.ts';
+import { checkHoneypot } from '~/app/core/server-utils/honeypot/honeypot.server.ts';
 import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
-import { combineResponseInits } from '~/app/shared/lib/utils/index.ts';
 import {
 	EmailSchema,
 	PasswordSchema,
@@ -41,170 +31,7 @@ import {
 	Spacer,
 	StatusButton,
 } from '~/app/shared/ui/index.ts';
-import { twoFAVerificationType } from '../settings+/profile.two-factor.tsx';
-import { getRedirectToUrl, type VerifyFunctionArgs } from './verify.tsx';
-
-const VERIFIED_TIME_KEY = 'verified-time';
-const UNVERIFIED_SESSION_KEY = 'unverified-session-id';
-const REMEMBER_KEY = 'remember-me';
-
-export async function handleNewSession(
-	{
-		request,
-		session,
-		redirectTo,
-		remember,
-	}: {
-		request: Request;
-		session: { userId: string; id: string; expirationDate: Date };
-		redirectTo?: string;
-		remember: boolean;
-	},
-	responseInit?: ResponseInit,
-) {
-	const verification = await prisma.verification.findUnique({
-		select: { id: true },
-		where: {
-			target_type: { target: session.userId, type: twoFAVerificationType },
-		},
-	});
-
-	const userHasTwoFactor = Boolean(verification);
-
-	if (userHasTwoFactor) {
-		const verifySession = await verifySessionStorage.getSession();
-		verifySession.set(UNVERIFIED_SESSION_KEY, session.id);
-		verifySession.set(REMEMBER_KEY, remember);
-
-		const redirectUrl = getRedirectToUrl({
-			request,
-			type: twoFAVerificationType,
-			target: session.userId,
-			redirectTo,
-		});
-
-		return redirect(
-			`${redirectUrl.pathname}?${redirectUrl.searchParams}`,
-			combineResponseInits(
-				{
-					headers: {
-						'set-cookie':
-							await verifySessionStorage.commitSession(verifySession),
-					},
-				},
-				responseInit,
-			),
-		);
-	} else {
-		const authSession = await authSessionStorage.getSession(
-			request.headers.get('cookie'),
-		);
-		authSession.set(SESSION_KEY, session.id);
-
-		return redirect(
-			safeRedirect(redirectTo),
-			combineResponseInits(
-				{
-					headers: {
-						'set-cookie': await authSessionStorage.commitSession(authSession, {
-							expires: remember ? session.expirationDate : undefined,
-						}),
-					},
-				},
-				responseInit,
-			),
-		);
-	}
-}
-
-export async function handleVerification({
-	request,
-	submission,
-}: VerifyFunctionArgs) {
-	invariant(
-		submission.status === 'success',
-		'Submission should be successful by now',
-	);
-
-	const cookieSession = await authSessionStorage.getSession(
-		request.headers.get('cookie'),
-	);
-	cookieSession.set(VERIFIED_TIME_KEY, Date.now());
-
-	const verifySession = await verifySessionStorage.getSession(
-		request.headers.get('cookie'),
-	);
-	const remember = verifySession.get(REMEMBER_KEY);
-
-	const { redirectTo } = submission.value;
-
-	const headers = new Headers();
-
-	const unverifiedSessionId = verifySession.get(UNVERIFIED_SESSION_KEY);
-
-	if (unverifiedSessionId) {
-		const session = await prisma.session.findUnique({
-			select: { expirationDate: true },
-			where: { id: unverifiedSessionId },
-		});
-
-		if (!session) {
-			throw await redirectWithToast('/login', {
-				type: 'error',
-				title: 'Invalid session',
-				description: 'Could not find session to verify. Please try again.',
-			});
-		}
-
-		cookieSession.set(SESSION_KEY, unverifiedSessionId);
-
-		headers.append(
-			'set-cookie',
-			await authSessionStorage.commitSession(cookieSession, {
-				expires: remember ? session.expirationDate : undefined,
-			}),
-		);
-	} else {
-		headers.append(
-			'set-cookie',
-			await authSessionStorage.commitSession(cookieSession),
-		);
-	}
-
-	headers.append(
-		'set-cookie',
-		await verifySessionStorage.destroySession(verifySession),
-	);
-
-	return redirect(safeRedirect(redirectTo), { headers });
-}
-
-export async function shouldRequestTwoFA(request: Request) {
-	const authSession = await authSessionStorage.getSession(
-		request.headers.get('cookie'),
-	);
-	const verifySession = await verifySessionStorage.getSession(
-		request.headers.get('cookie'),
-	);
-
-	if (verifySession.has(UNVERIFIED_SESSION_KEY)) return true;
-
-	const userId = await getUserId(request);
-	if (!userId) return false;
-
-	// if it's over two hours since they last verified, we should request 2FA again
-	const userHasTwoFA = await prisma.verification.findUnique({
-		select: { id: true },
-		where: { target_type: { target: userId, type: twoFAVerificationType } },
-	});
-
-	if (!userHasTwoFA) return false;
-
-	const verifiedTime = authSession.get(VERIFIED_TIME_KEY) ?? new Date(0);
-	const twoHours = 1000 * 60 * 2;
-
-	return Date.now() - verifiedTime > twoHours;
-}
+import { handleNewSession } from './login.server.ts';
 
 const LoginFormSchema = z.object({
 	usernameOrEmail: z.union([EmailSchema, UsernameSchema]),

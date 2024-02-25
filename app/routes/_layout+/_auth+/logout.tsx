@@ -1,5 +1,5 @@
 import { redirect, type ActionFunctionArgs } from '@remix-run/node';
-import { logout } from '~/app/core/server/auth/auth.server.ts';
+import { logout } from '~/app/core/server-utils/auth/auth.server';
 
 export async function loader() {
 	return redirect('/');
