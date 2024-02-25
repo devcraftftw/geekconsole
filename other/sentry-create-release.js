@@ -3,8 +3,8 @@ import { createRelease } from '@sentry/remix/scripts/createRelease.js';
 import { glob } from 'glob';
 import 'dotenv/config';
 
-const DEFAULT_URL_PREFIX = '#build/';
-const DEFAULT_BUILD_PATH = 'public/build';
+const DEFAULT_URL_PREFIX = '~/build/';
+const DEFAULT_BUILD_PATH = 'build';
 
 // exit with non-zero code if we have everything for Sentry
 if (
