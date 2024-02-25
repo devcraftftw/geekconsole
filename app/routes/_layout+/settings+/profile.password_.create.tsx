@@ -11,20 +11,20 @@ import { Form, Link, useActionData } from '@remix-run/react';
 import {
 	requireUserId,
 	getPasswordHash,
-} from '~/app/core/server-utils/auth/auth.server';
-import { prisma } from '~/app/core/server-utils/db/db.server';
-import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
+} from '#app/core/server-utils/auth/auth.server';
+import { prisma } from '#app/core/server-utils/db/db.server';
+import { useIsPending } from '#app/shared/lib/hooks/index.ts';
 import {
 	type BreadcrumbHandle,
 	PasswordAndConfirmPasswordSchema,
-} from '~/app/shared/schemas/index.ts';
+} from '#app/shared/schemas/index.ts';
 import {
 	Button,
 	ErrorList,
 	Field,
 	Icon,
 	StatusButton,
-} from '~/app/shared/ui/index.ts';
+} from '#app/shared/ui/index.ts';
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: <Icon name="dots-horizontal">Password</Icon>,

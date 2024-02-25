@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import './db-setup.ts';
-import '~/app/core/server-utils/env/env.server.ts';
+import '#app/core/server-utils/env/env.server.ts';
 // we need these to be imported first 👆
 
 import { installGlobals } from '@remix-run/node';

@@ -10,19 +10,19 @@ import { Form, Link, useActionData, useSearchParams } from '@remix-run/react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { HoneypotInputs } from 'remix-utils/honeypot/react';
 import { z } from 'zod';
-import { ProviderConnectionForm } from '~/app/core/components/providers/index.ts';
+import { ProviderConnectionForm } from '#app/core/components/providers/index.ts';
 import {
 	requireAnonymous,
 	login,
-} from '~/app/core/server-utils/auth/auth.server.ts';
-import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server.ts';
-import { checkHoneypot } from '~/app/core/server-utils/honeypot/honeypot.server.ts';
-import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
+} from '#app/core/server-utils/auth/auth.server.ts';
+import { validateCSRF } from '#app/core/server-utils/csrf/csrf.server.ts';
+import { checkHoneypot } from '#app/core/server-utils/honeypot/honeypot.server.ts';
+import { useIsPending } from '#app/shared/lib/hooks/index.ts';
 import {
 	EmailSchema,
 	PasswordSchema,
 	UsernameSchema,
-} from '~/app/shared/schemas/index.ts';
+} from '#app/shared/schemas/index.ts';
 import {
 	CheckboxField,
 	ErrorList,
@@ -30,7 +30,7 @@ import {
 	GeneralErrorBoundary,
 	Spacer,
 	StatusButton,
-} from '~/app/shared/ui/index.ts';
+} from '#app/shared/ui/index.ts';
 import { handleNewSession } from './login.server.ts';
 
 const LoginFormSchema = z.object({

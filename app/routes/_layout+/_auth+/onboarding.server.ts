@@ -1,6 +1,6 @@
 import { invariant } from '@epic-web/invariant';
 import { redirect } from '@remix-run/node';
-import { verifySessionStorage } from '~/app/core/server-utils/verification/verification.server.ts';
+import { verifySessionStorage } from '#app/core/server-utils/verification/verification.server.ts';
 import { ONBOARDING_EMAIL_SESSION_KEY } from './onboarding.tsx';
 import { type VerifyFunctionArgs } from './verify.server.ts';
 

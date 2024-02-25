@@ -1,6 +1,6 @@
 import { useNavigation } from '@remix-run/react';
 
-import { cn } from '~/app/shared/lib/utils/index.ts';
+import { cn } from '#app/shared/lib/utils/index.ts';
 
 export function GlobalLoading() {
 	const navigation = useNavigation();

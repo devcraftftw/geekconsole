@@ -9,14 +9,14 @@ import { test } from 'vitest';
 import {
 	getSessionExpirationDate,
 	SESSION_KEY,
-} from '~/app/core/server-utils/auth/auth.server';
-import { prisma } from '~/app/core/server-utils/db/db.server';
-import { authSessionStorage } from '~/app/core/server-utils/session/session.server';
-import { loader as rootLoader } from '~/app/root.tsx';
+} from '#app/core/server-utils/auth/auth.server';
+import { prisma } from '#app/core/server-utils/db/db.server';
+import { authSessionStorage } from '#app/core/server-utils/session/session.server';
+import { loader as rootLoader } from '#app/root.tsx';
 import {
 	default as UsernameRoute,
 	loader,
-} from '~/app/routes/_layout+/profile.$username';
+} from '#app/routes/_layout+/profile.$username';
 import { createUser, getUserImages } from '../db-utils';
 
 test('The user profile when not logged in as self', async () => {

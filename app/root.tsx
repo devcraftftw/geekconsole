@@ -21,7 +21,7 @@ import { type PropsWithChildren } from 'react';
 import { AuthenticityTokenProvider } from 'remix-utils/csrf/react';
 
 import { HoneypotProvider } from 'remix-utils/honeypot/react';
-import { href as iconsHref } from '~/app/shared/ui/Icons/Icon.tsx';
+import { href as iconsHref } from '#app/shared/ui/Icons/Icon.tsx';
 import {
 	ClientHintCheck,
 	getHints,

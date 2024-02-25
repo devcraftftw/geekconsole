@@ -21,26 +21,26 @@ import {
 } from '@remix-run/react';
 import { safeRedirect } from 'remix-utils/safe-redirect';
 import { z } from 'zod';
-import { ProviderNameSchema } from '~/app/core/components/providers/index.ts';
+import { ProviderNameSchema } from '#app/core/components/providers/index.ts';
 import {
 	requireAnonymous,
 	authenticator,
 	signupWithConnection,
 	SESSION_KEY,
-} from '~/app/core/server-utils/auth/auth.server.ts';
-import { redirectWithConfetti } from '~/app/core/server-utils/confetti/confetti.server.ts';
-import { prisma } from '~/app/core/server-utils/db/db.server.ts';
-import { authSessionStorage } from '~/app/core/server-utils/session/session.server.ts';
-import { verifySessionStorage } from '~/app/core/server-utils/verification/verification.server.ts';
-import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
-import { NameSchema, UsernameSchema } from '~/app/shared/schemas/index.ts';
+} from '#app/core/server-utils/auth/auth.server.ts';
+import { redirectWithConfetti } from '#app/core/server-utils/confetti/confetti.server.ts';
+import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { authSessionStorage } from '#app/core/server-utils/session/session.server.ts';
+import { verifySessionStorage } from '#app/core/server-utils/verification/verification.server.ts';
+import { useIsPending } from '#app/shared/lib/hooks/index.ts';
+import { NameSchema, UsernameSchema } from '#app/shared/schemas/index.ts';
 import {
 	CheckboxField,
 	ErrorList,
 	Field,
 	Spacer,
 	StatusButton,
-} from '~/app/shared/ui/index.ts';
+} from '#app/shared/ui/index.ts';
 import { ONBOARDING_EMAIL_SESSION_KEY } from './onboarding.tsx';
 
 export const PROVIDER_ID_KEY = 'providerId';

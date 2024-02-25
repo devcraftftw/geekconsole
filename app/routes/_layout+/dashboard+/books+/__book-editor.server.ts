@@ -9,9 +9,9 @@ import {
 	type ActionFunctionArgs,
 } from '@remix-run/node';
 import { z } from 'zod';
-import { requireUserId } from '~/app/core/server-utils/auth/auth.server';
-import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server';
-import { prisma } from '~/app/core/server-utils/db/db.server';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server';
+import { validateCSRF } from '#app/core/server-utils/csrf/csrf.server';
+import { prisma } from '#app/core/server-utils/db/db.server';
 import {
 	BookFormSchema,
 	MAX_UPLOAD_SIZE,

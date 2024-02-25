@@ -10,17 +10,17 @@ import {
 import { Form, useActionData, useLoaderData } from '@remix-run/react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { z } from 'zod';
-import { requireUserId } from '~/app/core/server-utils/auth/auth.server';
-import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server';
-import { prisma } from '~/app/core/server-utils/db/db.server';
-import { sendEmail } from '~/app/core/server-utils/email/email.server';
-import { verifySessionStorage } from '~/app/core/server-utils/verification/verification.server';
-import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server';
+import { validateCSRF } from '#app/core/server-utils/csrf/csrf.server';
+import { prisma } from '#app/core/server-utils/db/db.server';
+import { sendEmail } from '#app/core/server-utils/email/email.server';
+import { verifySessionStorage } from '#app/core/server-utils/verification/verification.server';
+import { useIsPending } from '#app/shared/lib/hooks/index.ts';
 import {
 	type BreadcrumbHandle,
 	EmailSchema,
-} from '~/app/shared/schemas/index.ts';
-import { ErrorList, Field, Icon, StatusButton } from '~/app/shared/ui/index.ts';
+} from '#app/shared/schemas/index.ts';
+import { ErrorList, Field, Icon, StatusButton } from '#app/shared/ui/index.ts';
 import {
 	prepareVerification,
 	requireRecentVerification,

@@ -1,7 +1,7 @@
 import {
 	getInstanceInfo,
 	getInternalInstanceDomain,
-} from '~/app/core/server-utils/litefs/litefs.server';
+} from '#app/core/server-utils/litefs/litefs.server';
 
 export async function updatePrimaryCacheValue({
 	key,

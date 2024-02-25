@@ -1,4 +1,4 @@
-import { generateTOTP } from '~/app/core/server-utils/totp/totp.server';
+import { generateTOTP } from '#app/core/server-utils/totp/totp.server';
 
 // Paste your string here. It should start with "otpauth://totp/" and include a secret and other params
 const otpString = ``;

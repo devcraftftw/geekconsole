@@ -4,12 +4,12 @@ import { safeRedirect } from 'remix-utils/safe-redirect';
 import {
 	getUserId,
 	SESSION_KEY,
-} from '~/app/core/server-utils/auth/auth.server.ts';
-import { prisma } from '~/app/core/server-utils/db/db.server.ts';
-import { authSessionStorage } from '~/app/core/server-utils/session/session.server.ts';
-import { redirectWithToast } from '~/app/core/server-utils/toast/toast.server.ts';
-import { verifySessionStorage } from '~/app/core/server-utils/verification/verification.server.ts';
-import { combineResponseInits } from '~/app/shared/lib/utils/index.ts';
+} from '#app/core/server-utils/auth/auth.server.ts';
+import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { authSessionStorage } from '#app/core/server-utils/session/session.server.ts';
+import { redirectWithToast } from '#app/core/server-utils/toast/toast.server.ts';
+import { verifySessionStorage } from '#app/core/server-utils/verification/verification.server.ts';
+import { combineResponseInits } from '#app/shared/lib/utils/index.ts';
 import { twoFAVerificationType } from '../settings+/profile.two-factor.tsx';
 import { getRedirectToUrl, type VerifyFunctionArgs } from './verify.server.ts';
 

@@ -21,8 +21,8 @@ import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { useSpinDelay } from 'spin-delay';
 import { z } from 'zod';
 
-import { useSubmitting } from '~/app/shared/lib/hooks/index.ts';
-import { cn, getBookImgSrc } from '~/app/shared/lib/utils/index.ts';
+import { useSubmitting } from '#app/shared/lib/hooks/index.ts';
+import { cn, getBookImgSrc } from '#app/shared/lib/utils/index.ts';
 import {
 	Button,
 	Card,
@@ -34,7 +34,7 @@ import {
 	Label,
 	RadioGroup,
 	RadioGroupItem,
-} from '~/app/shared/ui/index.ts';
+} from '#app/shared/ui/index.ts';
 import { type action } from './__book-editor.server';
 
 type CleanBook = Omit<

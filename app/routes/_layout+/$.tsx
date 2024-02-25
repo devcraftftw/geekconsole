@@ -6,7 +6,7 @@
 // message for them than the Remix and/or browser default.
 
 import { Link, useLocation } from '@remix-run/react';
-import { GeneralErrorBoundary } from '~/app/shared/ui/index.ts';
+import { GeneralErrorBoundary } from '#app/shared/ui/index.ts';
 
 export async function loader() {
 	throw new Response('Not found', { status: 404 });

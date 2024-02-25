@@ -1,9 +1,9 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo';
 import { type LoaderFunctionArgs, json } from '@remix-run/node';
 import { useLoaderData, type MetaFunction } from '@remix-run/react';
-import { requireUserId } from '~/app/core/server-utils/auth/auth.server.ts';
-import { prisma } from '~/app/core/server-utils/db/db.server.ts';
-import { type BreadcrumbHandle } from '~/app/shared/schemas';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server.ts';
+import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { type BreadcrumbHandle } from '#app/shared/schemas';
 import BookEditor from './__book-editor';
 
 export { action } from './__book-editor.server';

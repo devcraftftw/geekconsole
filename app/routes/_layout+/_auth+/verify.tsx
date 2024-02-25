@@ -5,15 +5,15 @@ import { Form, useActionData, useSearchParams } from '@remix-run/react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { HoneypotInputs } from 'remix-utils/honeypot/react';
 import { z } from 'zod';
-import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server';
-import { checkHoneypot } from '~/app/core/server-utils/honeypot/honeypot.server';
-import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
+import { validateCSRF } from '#app/core/server-utils/csrf/csrf.server';
+import { checkHoneypot } from '#app/core/server-utils/honeypot/honeypot.server';
+import { useIsPending } from '#app/shared/lib/hooks/index.ts';
 import {
 	ErrorList,
 	Field,
 	Spacer,
 	StatusButton,
-} from '~/app/shared/ui/index.ts';
+} from '#app/shared/ui/index.ts';
 import { validateRequest } from './verify.server';
 
 export const codeQueryParam = 'code';

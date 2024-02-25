@@ -4,11 +4,11 @@ import { generateTOTP, verifyTOTP } from '@epic-web/totp';
 import { json } from '@remix-run/node';
 import { ensurePrimary } from 'litefs-js/remix';
 import { z } from 'zod';
-import { requireUserId } from '~/app/core/server-utils/auth/auth.server.ts';
-import { prisma } from '~/app/core/server-utils/db/db.server.ts';
-import { redirectWithToast } from '~/app/core/server-utils/toast/toast.server.ts';
-import { handleVerification as handleChangeEmailVerification } from '~/app/routes/_layout+/settings+/profile.change-email.server.tsx';
-import { getDomainUrl } from '~/app/shared/lib/utils/index.ts';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server.ts';
+import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { redirectWithToast } from '#app/core/server-utils/toast/toast.server.ts';
+import { handleVerification as handleChangeEmailVerification } from '#app/routes/_layout+/settings+/profile.change-email.server.tsx';
+import { getDomainUrl } from '#app/shared/lib/utils/index.ts';
 import { twoFAVerificationType } from '../settings+/profile.two-factor.tsx';
 import { type twoFAVerifyVerificationType } from '../settings+/profile.two-factor.verify.tsx';
 import {

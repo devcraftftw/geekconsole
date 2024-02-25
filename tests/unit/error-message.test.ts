@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { expect, test } from 'vitest';
-import { getErrorMessage } from '~/app/shared/lib/utils/index.ts';
+import { getErrorMessage } from '#app/shared/lib/utils/index.ts';
 import { consoleError } from '../setup/setup-test-env.ts';
 
 test('Error object returns message', () => {

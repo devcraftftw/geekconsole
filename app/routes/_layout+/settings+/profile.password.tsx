@@ -14,22 +14,22 @@ import {
 	requireUserId,
 	verifyUserPassword,
 	getPasswordHash,
-} from '~/app/core/server-utils/auth/auth.server';
-import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server';
-import { prisma } from '~/app/core/server-utils/db/db.server';
-import { redirectWithToast } from '~/app/core/server-utils/toast/toast.server';
-import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
+} from '#app/core/server-utils/auth/auth.server';
+import { validateCSRF } from '#app/core/server-utils/csrf/csrf.server';
+import { prisma } from '#app/core/server-utils/db/db.server';
+import { redirectWithToast } from '#app/core/server-utils/toast/toast.server';
+import { useIsPending } from '#app/shared/lib/hooks/index.ts';
 import {
 	type BreadcrumbHandle,
 	PasswordSchema,
-} from '~/app/shared/schemas/index.ts';
+} from '#app/shared/schemas/index.ts';
 import {
 	Button,
 	ErrorList,
 	Field,
 	Icon,
 	StatusButton,
-} from '~/app/shared/ui/index.ts';
+} from '#app/shared/ui/index.ts';
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: <Icon name="dots-horizontal">Password</Icon>,

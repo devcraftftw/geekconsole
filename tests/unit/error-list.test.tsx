@@ -7,7 +7,7 @@
 import { faker } from '@faker-js/faker';
 import { render, screen } from '@testing-library/react';
 import { expect, test } from 'vitest';
-import { ErrorList } from '~/app/shared/ui/index.ts';
+import { ErrorList } from '#app/shared/ui/index.ts';
 
 test('shows nothing when given an empty list', async () => {
 	render(<ErrorList />);

@@ -1,9 +1,9 @@
 import { getFormProps, useForm } from '@conform-to/react';
 import { useFetcher } from '@remix-run/react';
-import { type Theme } from '~/app/core/server-utils/theme/theme.server';
-import { type action as rootAction } from '~/app/root.tsx';
-import { useOptimisticThemeMode } from '~/app/shared/lib/hooks/index.ts';
-import { ErrorList, Icon } from '~/app/shared/ui/index.ts';
+import { type Theme } from '#app/core/server-utils/theme/theme.server';
+import { type action as rootAction } from '#app/root.tsx';
+import { useOptimisticThemeMode } from '#app/shared/lib/hooks/index.ts';
+import { ErrorList, Icon } from '#app/shared/ui/index.ts';
 
 export function ThemeSwitcher({
 	userPreference,
