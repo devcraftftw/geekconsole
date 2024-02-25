@@ -9,10 +9,10 @@ import {
 } from '@remix-run/node';
 import { Form, Link, useActionData } from '@remix-run/react';
 import {
-	getPasswordHash,
-	prisma,
 	requireUserId,
-} from '~/app/core/server/index.ts';
+	getPasswordHash,
+} from '~/app/core/server-utils/auth/auth.server';
+import { prisma } from '~/app/core/server-utils/db/db.server';
 import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
 import {
 	type BreadcrumbHandle,

@@ -16,13 +16,11 @@ import {
 	ProviderConnectionForm,
 	providerIcons,
 } from '~/app/core/components/providers/index.ts';
-import {
-	createToastHeaders,
-	makeTimings,
-	prisma,
-	requireUserId,
-	resolveConnectionData,
-} from '~/app/core/server/index.ts';
+import { requireUserId } from '~/app/core/server-utils/auth/auth.server';
+import { resolveConnectionData } from '~/app/core/server-utils/connections/connections.server';
+import { prisma } from '~/app/core/server-utils/db/db.server';
+import { makeTimings } from '~/app/core/server-utils/timing/timing.server';
+import { createToastHeaders } from '~/app/core/server-utils/toast/toast.server';
 import { type BreadcrumbHandle } from '~/app/shared/schemas/index.ts';
 import {
 	Icon,

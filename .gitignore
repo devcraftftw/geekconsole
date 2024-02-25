@@ -1,11 +1,10 @@
-/.cache
+.cache
 
 node_modules
 .DS_store
 .DS_Store
 
 /build
-/public/build
 /server-build
 .env
 .env.production

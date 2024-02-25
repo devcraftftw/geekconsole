@@ -1,8 +1,12 @@
 import { invariantResponse } from '@epic-web/invariant';
 import { json, type LoaderFunctionArgs } from '@remix-run/node';
-import { getAllInstances, getInstanceInfo } from 'litefs-js';
-import { ensureInstance } from 'litefs-js/remix.js';
-import { cache, requireUserWithRole } from '~/app/core/server/index.ts';
+import { cache } from '~/app/core/server-utils/cache/cache.server';
+import {
+	ensureInstance,
+	getAllInstances,
+	getInstanceInfo,
+} from '~/app/core/server-utils/litefs/litefs.server';
+import { requireUserWithRole } from '~/app/core/server-utils/permissions/permissions.server';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	await requireUserWithRole(request, 'admin');

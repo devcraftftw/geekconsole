@@ -2,7 +2,7 @@ import fs from 'fs';
 import { invariant } from '@epic-web/invariant';
 import { faker } from '@faker-js/faker';
 import { type Book, type BookImage } from '@prisma/client';
-import { prisma } from '~/app/core/server/index.ts';
+import { prisma } from '~/app/core/server-utils/db/db.server.ts';
 import { expect, test } from '../playwright-utils.ts';
 
 test('Users can create a book with an image', async ({ page, login }) => {

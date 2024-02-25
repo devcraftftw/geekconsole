@@ -7,7 +7,7 @@ import animatePlugin from 'tailwindcss-animate';
 import radixPlugin from 'tailwindcss-radix';
 
 // it's imported like this by purpose, DO NOT CHANGE
-import { extendedTheme } from './app/core/utils/extendedTheme/extendedTheme.ts';
+import { extendedTheme } from './app/core/client-utils/extendedTheme/extendedTheme.ts';
 import { marketingPreset } from './app/routes/_layout+/_marketing+/marketing-preset.ts';
 
 export default {

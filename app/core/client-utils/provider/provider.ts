@@ -1,5 +1,5 @@
 import { type Strategy } from 'remix-auth';
-import { type Timings } from '~/app/core/server/timing/timing.server.ts';
+import { type Timings } from '../../server-utils/timing/timing.server';
 
 // Define a user type for cleaner typing
 export type ProviderUser = {

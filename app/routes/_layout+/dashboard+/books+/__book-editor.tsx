@@ -9,31 +9,17 @@ import {
 	getCollectionProps,
 } from '@conform-to/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
-import { invariant } from '@epic-web/invariant';
-import { createId as cuid } from '@paralleldrive/cuid2';
 import {
 	type BookReadingStatus,
 	type Book,
 	type BookImage,
 } from '@prisma/client';
-import {
-	type SerializeFrom,
-	type LoaderFunctionArgs,
-	json,
-	redirect,
-	unstable_parseMultipartFormData as parseMultipartFormData,
-	unstable_createMemoryUploadHandler as createMemoryUploadHandler,
-} from '@remix-run/node';
+import { type SerializeFrom } from '@remix-run/node';
 import { useActionData, Form } from '@remix-run/react';
 import { type ElementRef, useRef, useState } from 'react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { useSpinDelay } from 'spin-delay';
 import { z } from 'zod';
-import {
-	prisma,
-	requireUserId,
-	validateCSRF,
-} from '~/app/core/server/index.ts';
 
 import { useSubmitting } from '~/app/shared/lib/hooks/index.ts';
 import { cn, getBookImgSrc } from '~/app/shared/lib/utils/index.ts';
@@ -49,6 +35,7 @@ import {
 	RadioGroup,
 	RadioGroupItem,
 } from '~/app/shared/ui/index.ts';
+import { type action } from './__book-editor.server';
 
 type CleanBook = Omit<
 	Book,
@@ -57,7 +44,7 @@ type CleanBook = Omit<
 
 type ReadingStatuses = Pick<BookReadingStatus, 'id' | 'name'>[];
 
-const MAX_UPLOAD_SIZE = 1024 * 1024 * 3; // 3MB
+export const MAX_UPLOAD_SIZE = 1024 * 1024 * 3; // 3MB
 
 const ImageFieldsetSchema = z.object({
 	id: z.string().optional(),
@@ -69,21 +56,9 @@ const ImageFieldsetSchema = z.object({
 		}, 'File size must be less than 3MB'),
 });
 
-type ImageFieldset = z.infer<typeof ImageFieldsetSchema>;
+export type ImageFieldset = z.infer<typeof ImageFieldsetSchema>;
 
-function imageHasId(
-	image: ImageFieldset,
-): image is ImageFieldset & { id: NonNullable<ImageFieldset['id']> } {
-	return image.id != null;
-}
-
-function imageHasFile(
-	image: ImageFieldset,
-): image is ImageFieldset & { file: NonNullable<ImageFieldset['file']> } {
-	return Boolean(image.file?.size && image.file?.size > 0);
-}
-
-const BookFormSchema = z.object({
+export const BookFormSchema = z.object({
 	id: z.string().optional(),
 	title: z
 		.string()
@@ -99,135 +74,6 @@ const BookFormSchema = z.object({
 	description: z.string().optional(),
 	comment: z.string().optional(),
 });
-
-export const action = async ({ request }: LoaderFunctionArgs) => {
-	const userId = await requireUserId(request);
-
-	const uploadHandler = createMemoryUploadHandler({
-		maxPartSize: MAX_UPLOAD_SIZE,
-	});
-
-	const formData = await parseMultipartFormData(request, uploadHandler);
-
-	await validateCSRF(formData, request.headers);
-
-	const submission = await parseWithZod(formData, {
-		schema: BookFormSchema.superRefine(async (data, ctx) => {
-			if (!data.id) return;
-
-			const book = await prisma.book.findUnique({
-				select: { id: true },
-				where: { id: data.id, ownerId: userId },
-			});
-
-			if (!book) {
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					message: 'Book not found',
-				});
-			}
-		}).transform(async ({ images = [], statusName, ...data }) => {
-			const readingStatuses = await prisma.bookReadingStatus.findMany({
-				select: { id: true, name: true },
-			});
-
-			const status = readingStatuses.find(
-				(status) => status.name === statusName,
-			);
-			invariant(status, 'Reading status must not be null or undefined');
-
-			return {
-				...data,
-				statusId: status.id,
-				imageUpdates: await Promise.all(
-					images.filter(imageHasId).map(async (i) => {
-						if (imageHasFile(i)) {
-							return {
-								id: i.id,
-								contentType: i.file.type,
-								blob: Buffer.from(await i.file.arrayBuffer()),
-							};
-						} else {
-							return {
-								id: i.id,
-							};
-						}
-					}),
-				),
-				newImages: await Promise.all(
-					images
-						.filter(imageHasFile)
-						.filter((i) => !i.id)
-						.map(async (image) => {
-							return {
-								contentType: image.file.type,
-								blob: Buffer.from(await image.file.arrayBuffer()),
-							};
-						}),
-				),
-			};
-		}),
-		async: true,
-	});
-
-	if (submission.status !== 'success') {
-		return json(
-			{ result: submission.reply() },
-			{
-				status: submission.status === 'error' ? 400 : 200,
-			},
-		);
-	}
-
-	const {
-		id: bookId,
-		title,
-		author,
-		year,
-		statusId,
-		description,
-		comment,
-		newImages = [],
-		imageUpdates = [],
-	} = submission.value;
-
-	const { id } = await prisma.book.upsert({
-		select: { id: true },
-		where: { id: bookId ?? '__new_book__' },
-		create: {
-			ownerId: userId,
-			title,
-			author,
-			year,
-			statusId,
-			description,
-			comment,
-			images: { create: newImages },
-		},
-		update: {
-			title,
-			author,
-			year,
-			statusId,
-			description,
-			comment,
-			images: {
-				deleteMany: { id: { notIn: imageUpdates.map((i) => i.id) } },
-				updateMany: imageUpdates.map((updates) => ({
-					where: { id: updates.id },
-					data: { ...updates, id: updates.blob ? cuid() : updates.id },
-				})),
-				create: newImages,
-			},
-		},
-	});
-
-	return redirect(`/dashboard/books/${id}`);
-};
-
-export const loader = async (_: LoaderFunctionArgs) => {
-	return json({});
-};
 
 export default function BookEditor({
 	readingStatuses,

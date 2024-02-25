@@ -1,6 +1,5 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
-import { invariant } from '@epic-web/invariant';
 import {
 	json,
 	redirect,
@@ -19,16 +18,16 @@ import { HoneypotInputs } from 'remix-utils/honeypot/react';
 import { safeRedirect } from 'remix-utils/safe-redirect';
 import { z } from 'zod';
 import {
-	SESSION_KEY,
-	authSessionStorage,
-	checkHoneypot,
-	prisma,
-	redirectWithConfetti,
 	requireAnonymous,
+	SESSION_KEY,
 	signup,
-	validateCSRF,
-	verifySessionStorage,
-} from '~/app/core/server/index.ts';
+} from '~/app/core/server-utils/auth/auth.server';
+import { redirectWithConfetti } from '~/app/core/server-utils/confetti/confetti.server';
+import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server';
+import { prisma } from '~/app/core/server-utils/db/db.server';
+import { checkHoneypot } from '~/app/core/server-utils/honeypot/honeypot.server';
+import { authSessionStorage } from '~/app/core/server-utils/session/session.server';
+import { verifySessionStorage } from '~/app/core/server-utils/verification/verification.server';
 import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
 import {
 	NameSchema,
@@ -42,9 +41,8 @@ import {
 	Spacer,
 	StatusButton,
 } from '~/app/shared/ui/index.ts';
-import { type VerifyFunctionArgs } from './verify.tsx';
 
-const ONBOARDING_EMAIL_SESSION_KEY = 'onboardingEmail';
+export const ONBOARDING_EMAIL_SESSION_KEY = 'onboardingEmail';
 
 const SignupFormSchema = z
 	.object({
@@ -160,28 +158,6 @@ export async function action({ request }: ActionFunctionArgs) {
 	);
 
 	return redirectWithConfetti(safeRedirect(redirectTo), { headers });
-}
-
-export async function handleVerification({
-	request,
-	submission,
-}: VerifyFunctionArgs) {
-	invariant(
-		submission.status === 'success',
-		'Submission should be successful by now',
-	);
-
-	const verifySession = await verifySessionStorage.getSession(
-		request.headers.get('cookie'),
-	);
-
-	verifySession.set(ONBOARDING_EMAIL_SESSION_KEY, submission.value.target);
-
-	return redirect('/onboarding', {
-		headers: {
-			'set-cookie': await verifySessionStorage.commitSession(verifySession),
-		},
-	});
 }
 
 export default function OnboardingRoute() {

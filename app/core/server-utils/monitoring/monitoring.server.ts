@@ -1,6 +1,6 @@
 import { ProfilingIntegration } from '@sentry/profiling-node';
 import * as Sentry from '@sentry/remix';
-import { prisma } from '../index.ts';
+import { prisma } from '../db/db.server';
 
 export function init() {
 	Sentry.init({

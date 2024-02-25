@@ -24,7 +24,7 @@ declare global {
 	}
 }
 
-export function init() {
+export function initEnv() {
 	const parsed = schema.safeParse(process.env);
 
 	if (parsed.success === false) {

@@ -11,13 +11,13 @@ import { Link, useFetcher, useLoaderData } from '@remix-run/react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { z } from 'zod';
 import {
-	SESSION_KEY,
-	authSessionStorage,
-	prisma,
-	redirectWithToast,
 	requireUserId,
-	validateCSRF,
-} from '~/app/core/server/index.ts';
+	SESSION_KEY,
+} from '~/app/core/server-utils/auth/auth.server.ts';
+import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server.ts';
+import { prisma } from '~/app/core/server-utils/db/db.server.ts';
+import { authSessionStorage } from '~/app/core/server-utils/session/session.server.ts';
+import { redirectWithToast } from '~/app/core/server-utils/toast/toast.server.ts';
 import { useDoubleCheck } from '~/app/shared/lib/hooks/index.ts';
 import { getUserImgSrc } from '~/app/shared/lib/utils/index.ts';
 import { NameSchema, UsernameSchema } from '~/app/shared/schemas/index.ts';

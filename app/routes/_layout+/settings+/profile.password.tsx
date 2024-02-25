@@ -11,13 +11,13 @@ import { Form, Link, useActionData } from '@remix-run/react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { z } from 'zod';
 import {
-	getPasswordHash,
-	prisma,
-	redirectWithToast,
 	requireUserId,
-	validateCSRF,
 	verifyUserPassword,
-} from '~/app/core/server/index.ts';
+	getPasswordHash,
+} from '~/app/core/server-utils/auth/auth.server';
+import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server';
+import { prisma } from '~/app/core/server-utils/db/db.server';
+import { redirectWithToast } from '~/app/core/server-utils/toast/toast.server';
 import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
 import {
 	type BreadcrumbHandle,

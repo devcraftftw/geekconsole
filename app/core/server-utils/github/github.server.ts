@@ -2,13 +2,11 @@ import { createId as cuid } from '@paralleldrive/cuid2';
 import { redirect } from '@remix-run/node';
 import { GitHubStrategy } from 'remix-auth-github';
 import { z } from 'zod';
-import {
-	connectionSessionStorage,
-	redirectWithToast,
-} from '~/app/core/server/index.ts';
-import { type AuthProvider } from '~/app/core/utils/index.ts';
+import { type AuthProvider } from '../../client-utils/provider/provider.ts';
 import { cache, cachified } from '../cache/cache.server.ts';
+import { connectionSessionStorage } from '../connections/connections.server.ts';
 import { type Timings } from '../timing/timing.server.ts';
+import { redirectWithToast } from '../toast/toast.server.ts';
 
 const GitHubUserSchema = z.object({ login: z.string() });
 const GitHubUserParseResult = z

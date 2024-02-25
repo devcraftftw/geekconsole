@@ -1,15 +1,15 @@
 import * as setCookieParser from 'set-cookie-parser';
 import { expect } from 'vitest';
+
+import '@testing-library/jest-dom/vitest';
+import { SESSION_KEY } from '~/app/core/server-utils/auth/auth.server.ts';
+import { prisma } from '~/app/core/server-utils/db/db.server.ts';
+import { authSessionStorage } from '~/app/core/server-utils/session/session.server.ts';
 import {
-	SESSION_KEY,
-	prisma,
-	authSessionStorage,
 	type ToastInput,
 	toastSessionStorage,
 	TOAST_KEY,
-} from '~/app/core/server/index.ts';
-
-import '@testing-library/jest-dom/vitest';
+} from '~/app/core/server-utils/toast/toast.server.ts';
 import { convertSetCookieToCookie } from '../utils.ts';
 
 expect.extend({

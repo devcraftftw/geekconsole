@@ -4,8 +4,8 @@
   
   on:
     workflow_dispatch:
-    push:
-      branches: [devops]
+    # push:
+    #   branches: [devops]
     # pull_request:
   
   jobs:

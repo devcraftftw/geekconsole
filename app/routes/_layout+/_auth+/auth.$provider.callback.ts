@@ -5,21 +5,25 @@ import {
 } from '~/app/core/components/providers/index.ts';
 import {
 	authenticator,
-	createToastHeaders,
-	destroyRedirectToHeader,
-	getRedirectCookieValue,
 	getSessionExpirationDate,
 	getUserId,
-	prisma,
-	redirectWithToast,
-	verifySessionStorage,
-} from '~/app/core/server/index.ts';
-import { combineHeaders } from '~/app/shared/lib/utils/index.ts';
-import { handleNewSession } from './login.tsx';
+} from '~/app/core/server-utils/auth/auth.server.ts';
+import { prisma } from '~/app/core/server-utils/db/db.server.ts';
 import {
-	ONBOARDING_EMAIL_SESSION_KEY,
-	PROVIDER_ID_KEY,
+	destroyRedirectToHeader,
+	getRedirectCookieValue,
+} from '~/app/core/server-utils/redirect/redirectCookie.server.ts';
+import {
+	createToastHeaders,
+	redirectWithToast,
+} from '~/app/core/server-utils/toast/toast.server.ts';
+import { verifySessionStorage } from '~/app/core/server-utils/verification/verification.server.ts';
+import { combineHeaders } from '~/app/shared/lib/utils/index.ts';
+import { handleNewSession } from './login.server.ts';
+import { ONBOARDING_EMAIL_SESSION_KEY } from './onboarding.tsx';
+import {
 	PREFILLED_PROFILE_KEY,
+	PROVIDER_ID_KEY,
 } from './onboarding_.$provider.tsx';
 
 const destroyRedirectTo = { 'set-cookie': destroyRedirectToHeader };

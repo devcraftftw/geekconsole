@@ -1,6 +1,6 @@
 import { parseWithZod } from '@conform-to/zod';
 import { useFetchers } from '@remix-run/react';
-import { useHints } from '~/app/core/utils/index.ts';
+import { useHints } from '~/app/core/client-utils/clientHints/clientHints.tsx';
 import { ThemeFormSchema } from '~/app/shared/schemas/index.ts';
 import { useRequestInfo } from '../useRequestInfo/useRequestInfo.tsx';
 

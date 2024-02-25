@@ -1,6 +1,6 @@
 import { createCookieSessionStorage } from '@remix-run/node';
 import { type ProviderName } from '~/app/core/components/providers/index.ts';
-import { type AuthProvider } from '~/app/core/utils/index.ts';
+import { type AuthProvider } from '../../client-utils/provider/provider.ts';
 import { GitHubProvider } from '../github/github.server.ts';
 import { type Timings } from '../timing/timing.server.ts';
 
