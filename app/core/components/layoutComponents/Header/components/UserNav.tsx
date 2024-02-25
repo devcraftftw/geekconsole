@@ -1,8 +1,8 @@
 import { Form, Link, useSubmit } from '@remix-run/react';
 import { useRef } from 'react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
-import { useUser } from '~/app/shared/lib/hooks/index.ts';
-import { getUserImgSrc } from '~/app/shared/lib/utils/index.ts';
+import { useUser } from '#app/shared/lib/hooks/index.ts';
+import { getUserImgSrc } from '#app/shared/lib/utils/index.ts';
 
 import {
 	Avatar,
@@ -17,7 +17,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 	Icon,
-} from '~/app/shared/ui/index.ts';
+} from '#app/shared/ui/index.ts';
 
 export const UserNav = () => {
 	const user = useUser();

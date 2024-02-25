@@ -1,6 +1,6 @@
 import * as setCookieParser from 'set-cookie-parser';
-import { SESSION_KEY } from '~/app/core/server-utils/auth/auth.server';
-import { authSessionStorage } from '~/app/core/server-utils/session/session.server';
+import { SESSION_KEY } from '#app/core/server-utils/auth/auth.server';
+import { authSessionStorage } from '#app/core/server-utils/session/session.server';
 
 export const BASE_URL = 'https://www.geekconsole.app';
 

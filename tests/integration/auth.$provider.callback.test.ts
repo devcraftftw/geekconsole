@@ -2,18 +2,18 @@ import { invariant } from '@epic-web/invariant';
 import { faker } from '@faker-js/faker';
 import { http } from 'msw';
 import { afterEach, test, expect } from 'vitest';
-import { GITHUB_PROVIDER_NAME } from '~/app/core/components/providers/index.ts';
+import { GITHUB_PROVIDER_NAME } from '#app/core/components/providers/index.ts';
 import {
 	SESSION_KEY,
 	getSessionExpirationDate,
-} from '~/app/core/server-utils/auth/auth.server.ts';
-import { connectionSessionStorage } from '~/app/core/server-utils/connections/connections.server.ts';
-import { prisma } from '~/app/core/server-utils/db/db.server.ts';
-import { authSessionStorage } from '~/app/core/server-utils/session/session.server.ts';
-import { generateTOTP } from '~/app/core/server-utils/totp/totp.server.ts';
-import { loader } from '~/app/routes/_layout+/_auth+/auth.$provider.callback.ts';
-import { twoFAVerificationType } from '~/app/routes/_layout+/settings+/profile.two-factor.tsx';
-import { BASE_URL, convertSetCookieToCookie } from '~/tests/utils.ts';
+} from '#app/core/server-utils/auth/auth.server.ts';
+import { connectionSessionStorage } from '#app/core/server-utils/connections/connections.server.ts';
+import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { authSessionStorage } from '#app/core/server-utils/session/session.server.ts';
+import { generateTOTP } from '#app/core/server-utils/totp/totp.server.ts';
+import { loader } from '#app/routes/_layout+/_auth+/auth.$provider.callback.ts';
+import { twoFAVerificationType } from '#app/routes/_layout+/settings+/profile.two-factor.tsx';
+import { BASE_URL, convertSetCookieToCookie } from '#tests/utils.ts';
 import { createUser } from '../db-utils.ts';
 import { deleteGitHubUsers, insertGitHubUser } from '../mocks/github.ts';
 import { server } from '../mocks/index.ts';

@@ -1,6 +1,6 @@
 import { Link } from '@remix-run/react';
-import { useTheme } from '~/app/shared/lib/hooks/index.ts';
-import { BigLogo, Button } from '~/app/shared/ui/index.ts';
+import { useTheme } from '#app/shared/lib/hooks/index.ts';
+import { BigLogo, Button } from '#app/shared/ui/index.ts';
 
 export const Footer = () => {
 	const theme = useTheme();

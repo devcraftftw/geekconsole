@@ -9,7 +9,7 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-} from '~/app/shared/ui/index.ts';
+} from '#app/shared/ui/index.ts';
 
 const LOGOUT_TIME = 1000 * 60 * 60 * 24;
 const MODAL_TIME = LOGOUT_TIME - 1000 * 60 * 2;

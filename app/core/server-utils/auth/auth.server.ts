@@ -4,8 +4,8 @@ import { redirect } from '@remix-run/node';
 import bcrypt from 'bcryptjs';
 import { Authenticator } from 'remix-auth';
 import { safeRedirect } from 'remix-utils/safe-redirect';
-import { type ProviderName } from '~/app/core/components/providers/index.ts';
-import { combineHeaders, downloadFile } from '~/app/shared/lib/utils/index.ts';
+import { type ProviderName } from '#app/core/components/providers/index.ts';
+import { combineHeaders, downloadFile } from '#app/shared/lib/utils/index.ts';
 import {
 	connectionSessionStorage,
 	providers,

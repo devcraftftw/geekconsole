@@ -1,7 +1,7 @@
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import * as React from 'react';
 
-import { cn } from '~/app/shared/lib/utils/index.ts';
+import { cn } from '#app/shared/lib/utils/index.ts';
 import { Icon } from '../Icons/Icon.tsx';
 
 const RadioGroup = React.forwardRef<

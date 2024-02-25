@@ -1,7 +1,7 @@
 import { type MetaFunction } from '@remix-run/node';
 import { Link } from '@remix-run/react';
-import { useOptionalUser } from '~/app/shared/lib/hooks';
-import { Button } from '~/app/shared/ui';
+import { useOptionalUser } from '#app/shared/lib/hooks';
+import { Button } from '#app/shared/ui';
 
 export const meta: MetaFunction = () => {
 	return [{ title: 'GeekConsole' }];

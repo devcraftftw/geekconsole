@@ -1,6 +1,6 @@
 import { generateSitemap } from '@nasa-gcn/remix-seo';
 import { type ServerBuild, type LoaderFunctionArgs } from '@remix-run/node';
-import { getDomainUrl } from '~/app/shared/lib/utils';
+import { getDomainUrl } from '#app/shared/lib/utils';
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
 	const serverBuild = (await context.serverBuild) as ServerBuild;

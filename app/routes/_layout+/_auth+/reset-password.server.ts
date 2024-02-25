@@ -1,7 +1,7 @@
 import { invariant } from '@epic-web/invariant';
 import { json, redirect } from '@remix-run/node';
-import { prisma } from '~/app/core/server-utils/db/db.server.ts';
-import { verifySessionStorage } from '~/app/core/server-utils/verification/verification.server.ts';
+import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { verifySessionStorage } from '#app/core/server-utils/verification/verification.server.ts';
 import { RESET_PASSWORD_USERNAME_SESSION_KEY } from './reset-password.tsx';
 import { type VerifyFunctionArgs } from './verify.server.ts';
 

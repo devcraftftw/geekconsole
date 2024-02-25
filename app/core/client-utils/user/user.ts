@@ -1,4 +1,4 @@
-import { type useUser } from '~/app/shared/lib/hooks';
+import { type useUser } from '#app/shared/lib/hooks';
 
 type Action = 'create' | 'read' | 'update' | 'delete';
 type Entity = 'user' | 'book' | 'carSpending';

@@ -19,18 +19,13 @@ import {
 import { useState } from 'react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { z } from 'zod';
-import { requireUserId } from '~/app/core/server-utils/auth/auth.server';
-import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server';
-import { prisma } from '~/app/core/server-utils/db/db.server';
-import { useDoubleCheck, useIsPending } from '~/app/shared/lib/hooks/index.ts';
-import { getUserImgSrc } from '~/app/shared/lib/utils/index.ts';
-import { type BreadcrumbHandle } from '~/app/shared/schemas/index.ts';
-import {
-	Button,
-	ErrorList,
-	Icon,
-	StatusButton,
-} from '~/app/shared/ui/index.ts';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server';
+import { validateCSRF } from '#app/core/server-utils/csrf/csrf.server';
+import { prisma } from '#app/core/server-utils/db/db.server';
+import { useDoubleCheck, useIsPending } from '#app/shared/lib/hooks/index.ts';
+import { getUserImgSrc } from '#app/shared/lib/utils/index.ts';
+import { type BreadcrumbHandle } from '#app/shared/schemas/index.ts';
+import { Button, ErrorList, Icon, StatusButton } from '#app/shared/ui/index.ts';
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: <Icon name="avatar">Photo</Icon>,

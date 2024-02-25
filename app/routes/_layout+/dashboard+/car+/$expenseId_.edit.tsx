@@ -2,10 +2,10 @@ import { invariantResponse } from '@epic-web/invariant';
 import { type SEOHandle } from '@nasa-gcn/remix-seo';
 import { json, type LoaderFunctionArgs } from '@remix-run/node';
 import { type MetaFunction, useLoaderData } from '@remix-run/react';
-import { requireUserId } from '~/app/core/server-utils/auth/auth.server';
-import { prisma } from '~/app/core/server-utils/db/db.server';
-import { type BreadcrumbHandle } from '~/app/shared/schemas';
-import { GeneralErrorBoundary } from '~/app/shared/ui';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server';
+import { prisma } from '#app/core/server-utils/db/db.server';
+import { type BreadcrumbHandle } from '#app/shared/schemas';
+import { GeneralErrorBoundary } from '#app/shared/ui';
 import CarExpenseEditor from './__car-expense-editor';
 
 export { action } from './__car-expense-editor.server';

@@ -1,11 +1,11 @@
 import { type MetaFunction } from '@remix-run/node';
-import { cn } from '~/app/shared/lib/utils/index.ts';
+import { cn } from '#app/shared/lib/utils/index.ts';
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from '~/app/shared/ui/index.ts';
+} from '#app/shared/ui/index.ts';
 import { logos } from './logos/logos.ts';
 
 export const meta: MetaFunction = () => [{ title: 'GeekConsole' }];

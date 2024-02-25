@@ -1,6 +1,6 @@
 import { redirect } from '@remix-run/node';
 import * as cookie from 'cookie';
-import { combineHeaders } from '~/app/shared/lib/utils/index.ts';
+import { combineHeaders } from '#app/shared/lib/utils/index.ts';
 
 const cookieName = 'gk_confetti';
 

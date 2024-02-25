@@ -11,17 +11,17 @@ import { Link, useFetcher } from '@remix-run/react';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { HoneypotInputs } from 'remix-utils/honeypot/react';
 import { z } from 'zod';
-import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server.ts';
-import { prisma } from '~/app/core/server-utils/db/db.server.ts';
-import { sendEmail } from '~/app/core/server-utils/email/email.server.ts';
-import { checkHoneypot } from '~/app/core/server-utils/honeypot/honeypot.server.ts';
-import { EmailSchema, UsernameSchema } from '~/app/shared/schemas/index.ts';
+import { validateCSRF } from '#app/core/server-utils/csrf/csrf.server.ts';
+import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { sendEmail } from '#app/core/server-utils/email/email.server.ts';
+import { checkHoneypot } from '#app/core/server-utils/honeypot/honeypot.server.ts';
+import { EmailSchema, UsernameSchema } from '#app/shared/schemas/index.ts';
 import {
 	ErrorList,
 	Field,
 	GeneralErrorBoundary,
 	StatusButton,
-} from '~/app/shared/ui/index.ts';
+} from '#app/shared/ui/index.ts';
 import { prepareVerification } from './verify.server.ts';
 
 const ForgotPasswordSchema = z.object({

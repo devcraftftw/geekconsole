@@ -1,8 +1,8 @@
 import { useNavigation } from '@remix-run/react';
 import { useEffect, useRef, useState } from 'react';
 import { useSpinDelay } from 'spin-delay';
-import { cn } from '~/app/shared/lib/utils';
-import { Icon } from '~/app/shared/ui';
+import { cn } from '#app/shared/lib/utils';
+import { Icon } from '#app/shared/ui';
 
 export function ProgressBar() {
 	const transition = useNavigation();

@@ -1,10 +1,10 @@
 import { invariant } from '@epic-web/invariant';
 import * as E from '@react-email/components';
 import { json } from '@remix-run/node';
-import { prisma } from '~/app/core/server-utils/db/db.server';
-import { sendEmail } from '~/app/core/server-utils/email/email.server';
-import { redirectWithToast } from '~/app/core/server-utils/toast/toast.server';
-import { verifySessionStorage } from '~/app/core/server-utils/verification/verification.server';
+import { prisma } from '#app/core/server-utils/db/db.server';
+import { sendEmail } from '#app/core/server-utils/email/email.server';
+import { redirectWithToast } from '#app/core/server-utils/toast/toast.server';
+import { verifySessionStorage } from '#app/core/server-utils/verification/verification.server';
 import {
 	type VerifyFunctionArgs,
 	requireRecentVerification,

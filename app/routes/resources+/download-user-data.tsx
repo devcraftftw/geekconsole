@@ -1,7 +1,7 @@
 import { json, type LoaderFunctionArgs } from '@remix-run/node';
-import { requireUserId } from '~/app/core/server-utils/auth/auth.server';
-import { prisma } from '~/app/core/server-utils/db/db.server';
-import { getDomainUrl } from '~/app/shared/lib/utils/index.ts';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server';
+import { prisma } from '#app/core/server-utils/db/db.server';
+import { getDomainUrl } from '#app/shared/lib/utils/index.ts';
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request);

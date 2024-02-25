@@ -21,26 +21,26 @@ import {
 	requireAnonymous,
 	SESSION_KEY,
 	signup,
-} from '~/app/core/server-utils/auth/auth.server';
-import { redirectWithConfetti } from '~/app/core/server-utils/confetti/confetti.server';
-import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server';
-import { prisma } from '~/app/core/server-utils/db/db.server';
-import { checkHoneypot } from '~/app/core/server-utils/honeypot/honeypot.server';
-import { authSessionStorage } from '~/app/core/server-utils/session/session.server';
-import { verifySessionStorage } from '~/app/core/server-utils/verification/verification.server';
-import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
+} from '#app/core/server-utils/auth/auth.server';
+import { redirectWithConfetti } from '#app/core/server-utils/confetti/confetti.server';
+import { validateCSRF } from '#app/core/server-utils/csrf/csrf.server';
+import { prisma } from '#app/core/server-utils/db/db.server';
+import { checkHoneypot } from '#app/core/server-utils/honeypot/honeypot.server';
+import { authSessionStorage } from '#app/core/server-utils/session/session.server';
+import { verifySessionStorage } from '#app/core/server-utils/verification/verification.server';
+import { useIsPending } from '#app/shared/lib/hooks/index.ts';
 import {
 	NameSchema,
 	PasswordSchema,
 	UsernameSchema,
-} from '~/app/shared/schemas/index.ts';
+} from '#app/shared/schemas/index.ts';
 import {
 	CheckboxField,
 	ErrorList,
 	Field,
 	Spacer,
 	StatusButton,
-} from '~/app/shared/ui/index.ts';
+} from '#app/shared/ui/index.ts';
 
 export const ONBOARDING_EMAIL_SESSION_KEY = 'onboardingEmail';
 

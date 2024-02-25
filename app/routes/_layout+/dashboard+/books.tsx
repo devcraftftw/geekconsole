@@ -7,10 +7,10 @@ import {
 	json,
 	useLocation,
 } from '@remix-run/react';
-import { requireUserId } from '~/app/core/server-utils/auth/auth.server';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server';
 
-import { type BreadcrumbHandle } from '~/app/shared/schemas';
-import { Button } from '~/app/shared/ui/index.ts';
+import { type BreadcrumbHandle } from '#app/shared/schemas';
+import { Button } from '#app/shared/ui/index.ts';
 
 export const meta: MetaFunction = () => {
 	return [

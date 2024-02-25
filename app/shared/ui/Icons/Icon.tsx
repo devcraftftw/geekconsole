@@ -1,6 +1,6 @@
 import { type SVGProps } from 'react';
+import { cn } from '#app/shared/lib/utils/index.ts';
 import { type IconName } from '@/icon-name';
-import { cn } from '~/app/shared/lib/utils/index.ts';
 import href from './sprite.svg';
 
 export { href };

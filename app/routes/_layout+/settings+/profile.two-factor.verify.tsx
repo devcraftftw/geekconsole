@@ -16,14 +16,14 @@ import {
 import * as QRCode from 'qrcode';
 import { AuthenticityTokenInput } from 'remix-utils/csrf/react';
 import { z } from 'zod';
-import { requireUserId } from '~/app/core/server-utils/auth/auth.server.ts';
-import { validateCSRF } from '~/app/core/server-utils/csrf/csrf.server.ts';
-import { prisma } from '~/app/core/server-utils/db/db.server.ts';
-import { redirectWithToast } from '~/app/core/server-utils/toast/toast.server.ts';
-import { isCodeValid } from '~/app/routes/_layout+/_auth+/verify.server.ts';
-import { useIsPending } from '~/app/shared/lib/hooks/index.ts';
-import { getDomainUrl } from '~/app/shared/lib/utils/index.ts';
-import { Field, Icon, StatusButton } from '~/app/shared/ui/index.ts';
+import { requireUserId } from '#app/core/server-utils/auth/auth.server.ts';
+import { validateCSRF } from '#app/core/server-utils/csrf/csrf.server.ts';
+import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { redirectWithToast } from '#app/core/server-utils/toast/toast.server.ts';
+import { isCodeValid } from '#app/routes/_layout+/_auth+/verify.server.ts';
+import { useIsPending } from '#app/shared/lib/hooks/index.ts';
+import { getDomainUrl } from '#app/shared/lib/utils/index.ts';
+import { Field, Icon, StatusButton } from '#app/shared/ui/index.ts';
 import { twoFAVerificationType } from './profile.two-factor.tsx';
 
 export const handle = {

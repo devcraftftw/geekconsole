@@ -6,7 +6,7 @@
 	"sideEffects": false,
 	"type": "module",
 	"imports": {
-		"~/*": "./*"
+		"#*": "./*"
 	},
 	"scripts": {
 		"build": "run-s build:*",
