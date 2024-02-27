@@ -41,6 +41,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 				},
 			},
 			description: true,
+			url: true,
 			comment: true,
 			images: {
 				select: {

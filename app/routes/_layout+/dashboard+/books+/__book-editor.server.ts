@@ -116,6 +116,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		year,
 		statusId,
 		description,
+		url,
 		comment,
 		newImages = [],
 		imageUpdates = [],
@@ -131,6 +132,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			year,
 			statusId,
 			description,
+			url,
 			comment,
 			images: { create: newImages },
 		},
@@ -140,6 +142,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			year,
 			statusId,
 			description,
+			url,
 			comment,
 			images: {
 				deleteMany: { id: { notIn: imageUpdates.map((i) => i.id) } },

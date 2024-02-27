@@ -199,6 +199,7 @@ async function seed() {
 						year: 2022,
 						statusId: reading.id,
 						description: 'My best book ever',
+						url: 'https://www.labirint.ru/books/234187/',
 						comment: 'My best book ever for real',
 						images: {
 							create: [volodyaImages.cuteKoala, volodyaImages.koalaEating],
@@ -211,6 +212,7 @@ async function seed() {
 						year: 2022,
 						statusId: haveRead.id,
 						description: 'My best book ever',
+						url: 'https://www.labirint.ru/books/234187/',
 						comment: 'My best book ever for real',
 						images: {
 							create: [volodyaImages.cuteKoala, volodyaImages.koalaEating],
@@ -223,6 +225,7 @@ async function seed() {
 						year: 2022,
 						statusId: wantToRead.id,
 						description: 'My best book ever',
+						url: 'https://www.labirint.ru/books/234187/',
 						comment: 'My best book ever for real',
 						images: {
 							create: [volodyaImages.cuteKoala, volodyaImages.koalaEating],
@@ -235,6 +238,7 @@ async function seed() {
 						year: 2022,
 						statusId: wantToRead.id,
 						description: 'My best book ever',
+						url: 'https://www.labirint.ru/books/234187/',
 						comment: 'My best book ever for real',
 						images: {
 							create: [volodyaImages.cuteKoala, volodyaImages.koalaEating],

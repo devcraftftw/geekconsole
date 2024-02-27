@@ -72,6 +72,13 @@ export const BookFormSchema = z.object({
 	images: z.array(ImageFieldsetSchema).max(5).optional(),
 	statusName: z.string(),
 	description: z.string().optional(),
+	url: z
+		.string()
+		.url({ message: 'Invalid url' })
+		.refine((value) => /^(https):\/\//i.test(value), {
+			message: 'Please, provide a HTTPS URL',
+		})
+		.optional(),
 	comment: z.string().optional(),
 });
 
@@ -174,6 +181,21 @@ export default function BookEditor({
 									<ErrorList
 										id={fields.year.errorId}
 										errors={fields.year.errors}
+									/>
+								</div>
+							</div>
+
+							{/* URL */}
+							<div>
+								<Label htmlFor={fields.url.id}>URL</Label>
+								<Input
+									placeholder="Book url"
+									{...getInputProps(fields.url, { type: 'url' })}
+								/>
+								<div className="min-h-[32px] px-4 pb-3 pt-1">
+									<ErrorList
+										id={fields.url.errorId}
+										errors={fields.url.errors}
 									/>
 								</div>
 							</div>

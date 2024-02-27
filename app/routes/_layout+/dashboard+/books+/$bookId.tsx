@@ -96,6 +96,20 @@ export default function BookOverview() {
 						<p className="mb-3 font-light text-muted-foreground">{book.year}</p>
 					</div>
 					<div>
+						<h4 className="font-bold">URL</h4>
+						<p className="mb-3 font-light text-muted-foreground">
+							{book.url ? (
+								<Button asChild variant="link" className="p-0">
+									<Link to={book.url} target="_blank" rel="noopener noreferrer">
+										External URL
+									</Link>
+								</Button>
+							) : (
+								'URL is not provided.'
+							)}
+						</p>
+					</div>
+					<div>
 						<h4 className="font-bold">Description</h4>
 						<p className="mb-3 font-light text-muted-foreground">
 							{book.description
@@ -106,7 +120,7 @@ export default function BookOverview() {
 					<div>
 						<h4 className="font-bold">Your comments</h4>
 						<p className="mb-3 font-light text-muted-foreground">
-							{book.comment ? book.comment : 'No comments yet. Add one!'}
+							{book.comment ? book.comment : 'No comments yet.'}
 						</p>
 					</div>
 
@@ -176,6 +190,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 				},
 			},
 			description: true,
+			url: true,
 			comment: true,
 			ownerId: true,
 			updatedAt: true,
