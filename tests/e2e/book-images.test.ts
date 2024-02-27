@@ -24,6 +24,7 @@ test('Users can create a book with an image', async ({ page, login }) => {
 	await page
 		.getByRole('textbox', { name: 'description' })
 		.fill(newBook.description);
+	await page.getByRole('textbox', { name: 'url' }).fill(newBook.url);
 	await page.getByRole('radio').nth(0).click();
 	await page
 		.getByRole('textbox', { name: 'your comments' })
@@ -65,6 +66,7 @@ test('Users can create a book with multiple images', async ({
 	await page
 		.getByRole('textbox', { name: 'description' })
 		.fill(newBook.description);
+	await page.getByRole('textbox', { name: 'url' }).fill(newBook.url);
 	await page.getByRole('radio').nth(0).click();
 	await page
 		.getByRole('textbox', { name: 'your comments' })
@@ -196,6 +198,7 @@ async function createBook() {
 		title: faker.lorem.sentence(),
 		author: faker.person.fullName(),
 		year: 2023,
+		url: 'https://www.labirint.ru/books/234187/',
 		statusId: readingStatus.id,
 		description: faker.lorem.paragraph(),
 		comment: faker.lorem.paragraph(),

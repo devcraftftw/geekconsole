@@ -21,6 +21,7 @@ test('Users can create books', async ({ page, login }) => {
 	await page
 		.getByRole('textbox', { name: 'description' })
 		.fill(newBook.description);
+	await page.getByRole('textbox', { name: 'url' }).fill(newBook.url);
 	await page.getByRole('radio').nth(1).setChecked(true);
 	await page
 		.getByRole('textbox', { name: 'your comments' })
@@ -59,6 +60,7 @@ test('Users can edit books', async ({ page, login }) => {
 	await page
 		.getByRole('textbox', { name: 'description' })
 		.fill(updatedBook.description);
+	await page.getByRole('textbox', { name: 'url' }).fill(updatedBook.url);
 	await page.getByRole('radio').nth(2).click();
 	await page
 		.getByRole('textbox', { name: 'your comments' })
@@ -91,7 +93,7 @@ test('Users can delete books', async ({ page, login }) => {
 
 	await page.goto(`/dashboard/books/${book.id}`);
 
-	await page.getByRole('button', { name: /delete/i }).click();
+	await page.getByRole('button', { name: /delete/i }).click({ clickCount: 2 });
 
 	await expect(
 		page.getByText('Your book has been deleted', { exact: true }),
@@ -112,6 +114,7 @@ async function createBook() {
 		title: faker.lorem.sentence(),
 		author: faker.person.fullName(),
 		year: 2023,
+		url: 'https://www.labirint.ru/books/234187/',
 		statusId: readingStatus.id,
 		description: faker.lorem.paragraph(),
 		comment: faker.lorem.paragraph(),
