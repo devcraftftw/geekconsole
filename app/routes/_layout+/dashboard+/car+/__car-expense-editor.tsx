@@ -105,12 +105,20 @@ export default function CarExpenseEditor({
 		setOpened(true);
 	}, []);
 
+	const dialogTitle = spending ? 'Edit the expense' : 'Add new expense';
+	const dialogDescription = spending
+		? 'Edit the expense here.'
+		: 'Add new expense here.';
+
 	return (
 		<Dialog
 			open={opened}
 			onOpenChange={() => {
 				setOpened(false);
-				navigate('/dashboard/car');
+
+				setTimeout(() => {
+					navigate('/dashboard/car');
+				}, 100);
 			}}
 		>
 			<DialogContent className="sm:max-w-[400px]">
@@ -123,9 +131,9 @@ export default function CarExpenseEditor({
 					) : null}
 
 					<DialogHeader>
-						<DialogTitle>Add new expense</DialogTitle>
+						<DialogTitle>{dialogTitle}</DialogTitle>
 						<DialogDescription>
-							Add new expense here. Click save when you're done.
+							{dialogDescription} Click save when you're done.
 						</DialogDescription>
 					</DialogHeader>
 

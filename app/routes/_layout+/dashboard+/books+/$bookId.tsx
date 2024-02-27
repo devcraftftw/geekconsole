@@ -22,7 +22,7 @@ import { validateCSRF } from '#app/core/server-utils/csrf/csrf.server';
 import { prisma } from '#app/core/server-utils/db/db.server';
 import { requireUserWithPermission } from '#app/core/server-utils/permissions/permissions.server';
 import { redirectWithToast } from '#app/core/server-utils/toast/toast.server';
-import { useIsPending } from '#app/shared/lib/hooks';
+import { useDoubleCheck, useIsPending } from '#app/shared/lib/hooks';
 import { getBookImgSrc } from '#app/shared/lib/utils';
 import {
 	DeleteBookFormSchema,
@@ -96,6 +96,20 @@ export default function BookOverview() {
 						<p className="mb-3 font-light text-muted-foreground">{book.year}</p>
 					</div>
 					<div>
+						<h4 className="font-bold">URL</h4>
+						<p className="mb-3 font-light text-muted-foreground">
+							{book.url ? (
+								<Button asChild variant="link" className="p-0">
+									<Link to={book.url} target="_blank" rel="noopener noreferrer">
+										External URL
+									</Link>
+								</Button>
+							) : (
+								'URL is not provided.'
+							)}
+						</p>
+					</div>
+					<div>
 						<h4 className="font-bold">Description</h4>
 						<p className="mb-3 font-light text-muted-foreground">
 							{book.description
@@ -106,15 +120,13 @@ export default function BookOverview() {
 					<div>
 						<h4 className="font-bold">Your comments</h4>
 						<p className="mb-3 font-light text-muted-foreground">
-							{book.comment ? book.comment : 'No comments yet. Add one!'}
+							{book.comment ? book.comment : 'No comments yet.'}
 						</p>
 					</div>
 
 					<Badge className="mb-3">{book.status.name}</Badge>
 
 					<div className="flex gap-4">
-						<DeleteBook id={book.id} />
-
 						<Button
 							asChild
 							className="min-[525px]:max-md:aspect-square min-[525px]:max-md:px-0"
@@ -125,6 +137,8 @@ export default function BookOverview() {
 								</Icon>
 							</Link>
 						</Button>
+
+						<DeleteBookButton id={book.id} />
 					</div>
 				</div>
 			</article>
@@ -132,9 +146,10 @@ export default function BookOverview() {
 	);
 }
 
-export function DeleteBook({ id }: { id: string }) {
+export function DeleteBookButton({ id }: { id: string }) {
 	const actionData = useActionData<typeof action>();
 	const isPending = useIsPending();
+	const dc = useDoubleCheck();
 	const [form] = useForm({
 		id: 'deleteBook',
 		lastResult: actionData?.result,
@@ -145,16 +160,20 @@ export function DeleteBook({ id }: { id: string }) {
 			<AuthenticityTokenInput />
 			<input type="hidden" name="bookId" value={id} />
 			<StatusButton
-				type="submit"
-				name="intent"
-				value={DELETE_BOOK_INTENT}
-				variant="destructive"
+				{...dc.getButtonProps({
+					type: 'submit',
+					name: 'intent',
+					value: DELETE_BOOK_INTENT,
+				})}
+				variant={dc.doubleCheck ? 'destructive' : 'default'}
 				status={isPending ? 'pending' : form.status ?? 'idle'}
 				disabled={isPending}
 				className="w-full max-md:aspect-square max-md:px-0"
 			>
 				<Icon name="trash" className="scale-125 max-md:scale-150">
-					<span className="max-md:hidden">Delete</span>
+					<span className="max-md:hidden">
+						{dc.doubleCheck ? 'Are you sure?' : 'Delete'}
+					</span>
 				</Icon>
 			</StatusButton>
 			<ErrorList errors={form.errors} id={form.errorId} />
@@ -176,6 +195,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 				},
 			},
 			description: true,
+			url: true,
 			comment: true,
 			ownerId: true,
 			updatedAt: true,

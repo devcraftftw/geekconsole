@@ -76,6 +76,7 @@ async function createBooks() {
 			year: 2023,
 			statusId: readingStatuses[0].id,
 			description: faker.lorem.paragraph(),
+			url: 'https://www.labirint.ru/books/234187/',
 			comment: faker.lorem.paragraph(),
 		},
 		{
@@ -84,6 +85,7 @@ async function createBooks() {
 			year: 2023,
 			statusId: readingStatuses[1].id,
 			description: faker.lorem.paragraph(),
+			url: 'https://www.labirint.ru/books/234187/',
 			comment: faker.lorem.paragraph(),
 		},
 	] satisfies Omit<Book, 'id' | 'createdAt' | 'updatedAt' | 'ownerId'>[];
