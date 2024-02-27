@@ -22,7 +22,7 @@ import { validateCSRF } from '#app/core/server-utils/csrf/csrf.server';
 import { prisma } from '#app/core/server-utils/db/db.server';
 import { requireUserWithPermission } from '#app/core/server-utils/permissions/permissions.server';
 import { redirectWithToast } from '#app/core/server-utils/toast/toast.server';
-import { useIsPending } from '#app/shared/lib/hooks';
+import { useDoubleCheck, useIsPending } from '#app/shared/lib/hooks';
 import { getBookImgSrc } from '#app/shared/lib/utils';
 import {
 	DeleteBookFormSchema,
@@ -127,8 +127,6 @@ export default function BookOverview() {
 					<Badge className="mb-3">{book.status.name}</Badge>
 
 					<div className="flex gap-4">
-						<DeleteBook id={book.id} />
-
 						<Button
 							asChild
 							className="min-[525px]:max-md:aspect-square min-[525px]:max-md:px-0"
@@ -139,6 +137,8 @@ export default function BookOverview() {
 								</Icon>
 							</Link>
 						</Button>
+
+						<DeleteBookButton id={book.id} />
 					</div>
 				</div>
 			</article>
@@ -146,9 +146,10 @@ export default function BookOverview() {
 	);
 }
 
-export function DeleteBook({ id }: { id: string }) {
+export function DeleteBookButton({ id }: { id: string }) {
 	const actionData = useActionData<typeof action>();
 	const isPending = useIsPending();
+	const dc = useDoubleCheck();
 	const [form] = useForm({
 		id: 'deleteBook',
 		lastResult: actionData?.result,
@@ -159,16 +160,20 @@ export function DeleteBook({ id }: { id: string }) {
 			<AuthenticityTokenInput />
 			<input type="hidden" name="bookId" value={id} />
 			<StatusButton
-				type="submit"
-				name="intent"
-				value={DELETE_BOOK_INTENT}
-				variant="destructive"
+				{...dc.getButtonProps({
+					type: 'submit',
+					name: 'intent',
+					value: DELETE_BOOK_INTENT,
+				})}
+				variant={dc.doubleCheck ? 'destructive' : 'default'}
 				status={isPending ? 'pending' : form.status ?? 'idle'}
 				disabled={isPending}
 				className="w-full max-md:aspect-square max-md:px-0"
 			>
 				<Icon name="trash" className="scale-125 max-md:scale-150">
-					<span className="max-md:hidden">Delete</span>
+					<span className="max-md:hidden">
+						{dc.doubleCheck ? 'Are you sure?' : 'Delete'}
+					</span>
 				</Icon>
 			</StatusButton>
 			<ErrorList errors={form.errors} id={form.errorId} />

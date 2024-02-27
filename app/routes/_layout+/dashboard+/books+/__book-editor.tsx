@@ -126,7 +126,7 @@ export default function BookEditor({
 						<Form
 							method="post"
 							encType="multipart/form-data"
-							className="grid w-full grid-cols-2 gap-4"
+							className="flex flex-col"
 							{...getFormProps(form)}
 						>
 							<AuthenticityTokenInput />
@@ -139,145 +139,153 @@ export default function BookEditor({
 
 							{book ? <input type="hidden" name="id" value={book.id} /> : null}
 
-							{/* TITLE */}
-							<div>
-								<Label htmlFor={fields.title.id}>Title</Label>
-								<Input
-									autoFocus
-									placeholder="Romeo & Juliet"
-									{...getInputProps(fields.title, { type: 'text' })}
-								/>
-								<div className="min-h-[32px] px-4 pb-3 pt-1">
-									<ErrorList
-										id={fields.title.errorId}
-										errors={fields.title.errors}
-									/>
-								</div>
-							</div>
-
-							{/* AUTHOR */}
-							<div>
-								<Label htmlFor={fields.author.id}>Author</Label>
-								<Input
-									placeholder="William Shakespear"
-									{...getInputProps(fields.author, { type: 'text' })}
-								/>
-								<div className="min-h-[32px] px-4 pb-3 pt-1">
-									<ErrorList
-										id={fields.author.errorId}
-										errors={fields.author.errors}
-									/>
-								</div>
-							</div>
-
-							{/* YEAR */}
-							<div>
-								<Label htmlFor={fields.year.id}>Year</Label>
-								<Input
-									placeholder="1597"
-									{...getInputProps(fields.year, { type: 'number' })}
-								/>
-								<div className="min-h-[32px] px-4 pb-3 pt-1">
-									<ErrorList
-										id={fields.year.errorId}
-										errors={fields.year.errors}
-									/>
-								</div>
-							</div>
-
-							{/* URL */}
-							<div>
-								<Label htmlFor={fields.url.id}>URL</Label>
-								<Input
-									placeholder="Book url"
-									{...getInputProps(fields.url, { type: 'url' })}
-								/>
-								<div className="min-h-[32px] px-4 pb-3 pt-1">
-									<ErrorList
-										id={fields.url.errorId}
-										errors={fields.url.errors}
-									/>
-								</div>
-							</div>
-
-							{/* DESCRIPTION */}
-							<div>
-								<Label htmlFor={fields.description.id}>Description</Label>
-								<Input
-									placeholder="Book description"
-									{...getInputProps(fields.description, { type: 'text' })}
-								/>
-								<div className="min-h-[32px] px-4 pb-3 pt-1">
-									<ErrorList
-										id={fields.description.errorId}
-										errors={fields.description.errors}
-									/>
-								</div>
-							</div>
-
-							{/* READING STATUS */}
-							<ReadingStatusRadioGroup
-								meta={fields.statusName}
-								readingStatuses={readingStatuses}
-							/>
-
-							{/* Comments */}
-							<div>
-								<Label htmlFor={fields.comment.id}>Your comments</Label>
-								<Input
-									placeholder="Share your thoughts about this book or leave some comments for your future reference"
-									{...getInputProps(fields.comment, { type: 'text' })}
-								/>
-								<div className="min-h-[32px] px-4 pb-3 pt-1">
-									<ErrorList
-										id={fields.comment.errorId}
-										errors={fields.comment.errors}
-									/>
-								</div>
-							</div>
-
-							{/* IMAGES */}
-							<div>
+							<div className="grid w-full grid-cols-2 gap-4">
+								{/* TITLE */}
 								<div>
-									<Label>Images</Label>
-									<ul className="flex flex-wrap gap-2">
-										{imageList.map((image, index) => (
-											<li key={image.key} className="relative">
-												<button
-													className="absolute bottom-36 left-24 text-foreground-destructive"
-													{...form.remove.getButtonProps({
-														name: fields.images.name,
-														index,
-													})}
-												>
-													<span aria-hidden>
-														<Icon name="cross-1" />
-													</span>
-													<span className="sr-only">
-														Remove image {index + 1}
-													</span>
-												</button>
-												<ImageChooser meta={image} />
-											</li>
-										))}
-									</ul>
+									<Label htmlFor={fields.title.id}>Title</Label>
+									<Input
+										autoFocus
+										placeholder="Romeo & Juliet"
+										{...getInputProps(fields.title, { type: 'text' })}
+									/>
+									<div className="min-h-[32px] px-4 pb-3 pt-1">
+										<ErrorList
+											id={fields.title.errorId}
+											errors={fields.title.errors}
+										/>
+									</div>
 								</div>
 
-								{/* ADD IMAGE */}
-								<Button
-									className="mt-3"
-									{...form.insert.getButtonProps({ name: fields.images.name })}
-								>
-									<span aria-hidden>
-										<Icon name="plus">Image</Icon>
-									</span>{' '}
-									<span className="sr-only">Add image</span>
-								</Button>
+								{/* AUTHOR */}
+								<div>
+									<Label htmlFor={fields.author.id}>Author</Label>
+									<Input
+										placeholder="William Shakespear"
+										{...getInputProps(fields.author, { type: 'text' })}
+									/>
+									<div className="min-h-[32px] px-4 pb-3 pt-1">
+										<ErrorList
+											id={fields.author.errorId}
+											errors={fields.author.errors}
+										/>
+									</div>
+								</div>
+
+								{/* YEAR */}
+								<div>
+									<Label htmlFor={fields.year.id}>Year</Label>
+									<Input
+										placeholder="1597"
+										{...getInputProps(fields.year, { type: 'number' })}
+									/>
+									<div className="min-h-[32px] px-4 pb-3 pt-1">
+										<ErrorList
+											id={fields.year.errorId}
+											errors={fields.year.errors}
+										/>
+									</div>
+								</div>
+
+								{/* URL */}
+								<div>
+									<Label htmlFor={fields.url.id}>URL</Label>
+									<Input
+										placeholder="Book url"
+										{...getInputProps(fields.url, { type: 'url' })}
+									/>
+									<div className="min-h-[32px] px-4 pb-3 pt-1">
+										<ErrorList
+											id={fields.url.errorId}
+											errors={fields.url.errors}
+										/>
+									</div>
+								</div>
+
+								{/* DESCRIPTION */}
+								<div>
+									<Label htmlFor={fields.description.id}>Description</Label>
+									<Input
+										placeholder="Book description"
+										{...getInputProps(fields.description, { type: 'text' })}
+									/>
+									<div className="min-h-[32px] px-4 pb-3 pt-1">
+										<ErrorList
+											id={fields.description.errorId}
+											errors={fields.description.errors}
+										/>
+									</div>
+								</div>
+
+								{/* READING STATUS */}
+								<ReadingStatusRadioGroup
+									meta={fields.statusName}
+									readingStatuses={readingStatuses}
+								/>
+
+								{/* IMAGES */}
+								<div>
+									<div>
+										<Label>Images</Label>
+										<ul className="flex flex-wrap gap-2">
+											{imageList.map((image, index) => (
+												<li key={image.key} className="relative">
+													<button
+														className="absolute bottom-36 left-24 text-foreground-destructive"
+														{...form.remove.getButtonProps({
+															name: fields.images.name,
+															index,
+														})}
+													>
+														<span aria-hidden>
+															<Icon name="cross-1" />
+														</span>
+														<span className="sr-only">
+															Remove image {index + 1}
+														</span>
+													</button>
+													<ImageChooser meta={image} />
+												</li>
+											))}
+										</ul>
+									</div>
+
+									{/* ADD IMAGE */}
+									<Button
+										className="mt-3"
+										{...form.insert.getButtonProps({
+											name: fields.images.name,
+										})}
+									>
+										<span aria-hidden>
+											<Icon name="plus">Image</Icon>
+										</span>{' '}
+										<span className="sr-only">Add image</span>
+									</Button>
+								</div>
+
+								{/* Comments */}
+								<div>
+									<Label htmlFor={fields.comment.id}>Your comments</Label>
+									<Input
+										placeholder="Share your thoughts about this book or leave some comments for your future reference"
+										{...getInputProps(fields.comment, { type: 'text' })}
+									/>
+									<div className="min-h-[32px] px-4 pb-3 pt-1">
+										<ErrorList
+											id={fields.comment.errorId}
+											errors={fields.comment.errors}
+										/>
+									</div>
+								</div>
+
+								<ErrorList id={form.errorId} errors={form.errors} />
 							</div>
 
-							<ErrorList id={form.errorId} errors={form.errors} />
-
-							<Button type="submit" disabled={showSpinner} className="mt-auto">
+							<Button
+								type="submit"
+								disabled={showSpinner}
+								className="ml-auto mt-auto w-48"
+							>
 								Submit
 							</Button>
 						</Form>
