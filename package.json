@@ -122,7 +122,7 @@
 		"@remix-run/eslint-config": "2.7.2",
 		"@remix-run/serve": "2.7.2",
 		"@remix-run/testing": "2.7.2",
-		"@sly-cli/sly": "^1.8.0",
+		"@sly-cli/sly": "^1.10.0",
 		"@storybook/addon-essentials": "^7.6.17",
 		"@storybook/addon-interactions": "^7.6.17",
 		"@storybook/addon-links": "^7.6.17",
