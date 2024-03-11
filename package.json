@@ -118,7 +118,7 @@
 		"@commitlint/config-conventional": "^18.6.2",
 		"@faker-js/faker": "^8.4.1",
 		"@playwright/test": "^1.41.2",
-		"@remix-run/dev": "2.7.2",
+		"@remix-run/dev": "2.8.1",
 		"@remix-run/eslint-config": "2.7.2",
 		"@remix-run/serve": "2.7.2",
 		"@remix-run/testing": "2.7.2",
