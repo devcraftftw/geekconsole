@@ -52,11 +52,6 @@ export const links: LinksFunction = () =>
 		// Preload svg sprite as a resource to avoid render blocking
 		{ rel: 'preload', href: iconsHref, as: 'image' },
 		// Preload CSS as a resource to avoid render blocking
-		{
-			rel: 'preload',
-			href: twStyles,
-			as: 'style',
-		},
 		{ rel: 'preload', href: fonts, as: 'style' },
 		{
 			rel: 'icon',
