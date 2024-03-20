@@ -30,6 +30,9 @@ RUN npm prune --omit=dev
 # Build the app
 FROM base as build
 
+ARG COMMIT_SHA
+ENV COMMIT_SHA=$COMMIT_SHA
+
 WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
@@ -38,7 +41,11 @@ COPY prisma .
 RUN npx prisma generate
 
 COPY . .
-RUN npm run build
+
+# Mount the secret and set it as an environment variable and run the build
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
+    export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) && \
+    npm run build
 
 # Finally, build the production image with minimal footprint
 FROM base
