@@ -139,25 +139,23 @@ jobs:
   deploy:
     name: 🚀 Deploy
     runs-on: ubuntu-latest
-    # needs: [lint, typecheck, vitest, playwright]
-    # only build/deploy main branch on pushes
-    if:
-      ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stage')
-      && github.event_name == 'push' }}
+    needs: [lint, typecheck, vitest, playwright]
+    # only build/deploy branches on pushes
+    if: ${{ github.event_name == 'push' }}
 
     steps:
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 👀 Read app name
-        uses: SebRollen/toml-action@v1.0.2
+        uses: SebRollen/toml-action@v1.2.0
         id: app_name
         with:
           file: 'fly.toml'
           field: 'app'
 
       - name: 🎈 Setup Fly
-        uses: superfly/flyctl-actions/setup-flyctl@v1.4
+        uses: superfly/flyctl-actions/setup-flyctl@1.5
 
       - name: 🚀 Deploy Staging
         if: ${{ github.ref == 'refs/heads/stage' }}
@@ -171,5 +169,6 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         run:
           flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
+          --build-secret SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

@@ -30,6 +30,9 @@ RUN npm prune --omit=dev
 # Build the app
 FROM base as build
 
+ARG COMMIT_SHA
+ENV COMMIT_SHA=$COMMIT_SHA
+
 WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
@@ -38,7 +41,11 @@ COPY prisma .
 RUN npx prisma generate
 
 COPY . .
-RUN npm run build
+
+# Mount the secret and set it as an environment variable and run the build
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
+    export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) && \
+    npm run build
 
 # Finally, build the production image with minimal footprint
 FROM base
@@ -53,6 +60,7 @@ ENV CACHE_DATABASE_PATH="$LITEFS_DIR/$CACHE_DATABASE_FILENAME"
 ENV INTERNAL_PORT="8080"
 ENV PORT="3000"
 ENV NODE_ENV="production"
+ENV PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK = "1"
 
 # COPY shortcut for connecting to database CLI
 RUN echo "#!/bin/sh\nset -x\nsqlite3 \$DATABASE_URL" > /usr/local/bin/database-cli && chmod +x /usr/local/bin/database-cli
