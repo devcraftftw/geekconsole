@@ -1,15 +1,16 @@
+import { type TestingLibraryMatchers } from '@testing-library/jest-dom/matchers';
 import * as setCookieParser from 'set-cookie-parser';
 import { expect } from 'vitest';
 
-import '@testing-library/jest-dom/vitest';
 import { SESSION_KEY } from '#app/core/server-utils/auth/auth.server.ts';
 import { prisma } from '#app/core/server-utils/db/db.server.ts';
 import { authSessionStorage } from '#app/core/server-utils/session/session.server.ts';
 import {
-	type ToastInput,
-	toastSessionStorage,
 	TOAST_KEY,
+	toastSessionStorage,
+	type ToastInput,
 } from '#app/core/server-utils/toast/toast.server.ts';
+import '@testing-library/jest-dom/vitest';
 import { convertSetCookieToCookie } from '../utils.ts';
 
 expect.extend({
@@ -165,10 +166,19 @@ type CustomMatchers<R = unknown> = {
 	toSendToast(toast: ToastInput): Promise<R>;
 };
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+interface ExtendedMatchers<R = unknown>
+	extends TestingLibraryMatchers<R, void> {}
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+interface ExtentedCustomMatchers<R = unknown>
+	extends CustomMatchers<R>,
+		ExtendedMatchers<R> {}
+
 declare module 'vitest' {
 	// dunno why, but ts does not see the extended types with type alias
 	// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-	interface Assertion<T = any> extends CustomMatchers<T> {}
+	interface Assertion<T = any> extends ExtentedCustomMatchers<T> {}
 	// dunno why, but ts does not see the extended types with type alias
 	// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 	interface AsymmetricMatchersContaining extends CustomMatchers {}
