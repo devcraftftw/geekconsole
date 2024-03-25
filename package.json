@@ -85,7 +85,7 @@
 		"execa": "^8.0.1",
 		"express": "^4.18.3",
 		"express-rate-limit": "^7.2.0",
-		"framer-motion": "^11.0.15",
+		"framer-motion": "^11.0.20",
 		"get-port": "^7.0.0",
 		"glob": "^10.3.10",
 		"helmet": "^7.1.0",
