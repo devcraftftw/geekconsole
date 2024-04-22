@@ -146,7 +146,7 @@
 		"@types/fs-extra": "^11.0.4",
 		"@types/morgan": "^1.9.9",
 		"@types/qrcode": "^1.5.5",
-		"@types/react": "^18.2.67",
+		"@types/react": "^18.2.79",
 		"@types/react-dom": "^18.2.22",
 		"@types/set-cookie-parser": "^2.4.7",
 		"@typescript-eslint/eslint-plugin": "^7.3.1",
