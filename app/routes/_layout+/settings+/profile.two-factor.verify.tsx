@@ -23,7 +23,12 @@ import { redirectWithToast } from '#app/core/server-utils/toast/toast.server.ts'
 import { isCodeValid } from '#app/routes/_layout+/_auth+/verify.server.ts';
 import { useIsPending } from '#app/shared/lib/hooks/index.ts';
 import { getDomainUrl } from '#app/shared/lib/utils/index.ts';
-import { Field, Icon, StatusButton } from '#app/shared/ui/index.ts';
+import {
+	ErrorList,
+	Icon,
+	OTPField,
+	StatusButton,
+} from '#app/shared/ui/index.ts';
 import { twoFAVerificationType } from './profile.two-factor.tsx';
 
 export const handle = {
@@ -194,18 +199,25 @@ export default function TwoFactorRoute() {
 					<Form method="POST" {...getFormProps(form)} className="flex-1">
 						<AuthenticityTokenInput />
 
-						<Field
-							labelProps={{
-								htmlFor: fields.code.id,
-								children: 'Code',
-							}}
-							inputProps={{
-								...getInputProps(fields.code, { type: 'text' }),
-								autoFocus: true,
-								autoComplete: 'one-time-code',
-							}}
-							errors={fields.code.errors}
-						/>
+						<div className="flex items-center justify-center">
+							<OTPField
+								labelProps={{
+									htmlFor: fields.code.id,
+									children: 'Code',
+								}}
+								inputProps={{
+									...getInputProps(fields.code, { type: 'text' }),
+									autoFocus: true,
+									autoComplete: 'one-time-code',
+								}}
+								errors={fields.code.errors}
+							/>
+						</div>
+
+						<div className="min-h-[32px] px-4 pb-3 pt-1">
+							<ErrorList id={form.errorId} errors={form.errors} />
+						</div>
+
 						<div className="flex justify-between gap-4">
 							<StatusButton
 								className="w-full"
