@@ -16,6 +16,8 @@ const schema = z.object({
 	GITHUB_CLIENT_ID: z.string(),
 	GITHUB_CLIENT_SECRET: z.string(),
 	SENTRY_DSN: z.string(),
+
+	ALLOW_INDEXING: z.enum(['true', 'false']).optional(),
 });
 
 declare global {
@@ -51,6 +53,7 @@ export function getEnv() {
 		MODE: process.env.NODE_ENV,
 		MOCKS: process.env.MOCKS,
 		SENTRY_DSN: process.env.SENTRY_DSN,
+		ALLOW_INDEXING: process.env.ALLOW_INDEXING,
 	};
 }
 
