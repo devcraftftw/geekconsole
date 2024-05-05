@@ -135,7 +135,8 @@ async function getUser(request: Request) {
 }
 
 const passthroughGitHub =
-	!process.env.GITHUB_CLIENT_ID.startsWith('MOCK_') && !process.env.TESTING;
+	!process.env.GITHUB_CLIENT_ID.startsWith('MOCK_') &&
+	process.env.NODE_ENV !== 'test';
 
 export const handlers: Array<HttpHandler> = [
 	// test this github stuff out without going through github's oauth flow by

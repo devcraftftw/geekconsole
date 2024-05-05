@@ -10,7 +10,7 @@ import { checkHoneypot } from '#app/core/server-utils/honeypot/honeypot.server';
 import { useIsPending } from '#app/shared/lib/hooks/index.ts';
 import {
 	ErrorList,
-	Field,
+	OTPField,
 	Spacer,
 	StatusButton,
 } from '#app/shared/ui/index.ts';
@@ -105,17 +105,19 @@ export default function VerifyRoute() {
 						<AuthenticityTokenInput />
 						<HoneypotInputs />
 
-						<Field
-							labelProps={{
-								htmlFor: fields[codeQueryParam].id,
-								children: 'Code',
-							}}
-							inputProps={{
-								...getInputProps(fields[codeQueryParam], { type: 'text' }),
-								autoComplete: 'one-time-code',
-							}}
-							errors={fields[codeQueryParam].errors}
-						/>
+						<div className="flex items-center justify-center">
+							<OTPField
+								labelProps={{
+									htmlFor: fields[codeQueryParam].id,
+									children: 'Code',
+								}}
+								inputProps={{
+									...getInputProps(fields[codeQueryParam], { type: 'text' }),
+									autoComplete: 'one-time-code',
+								}}
+								errors={fields[codeQueryParam].errors}
+							/>
+						</div>
 
 						<input
 							{...getInputProps(fields[typeQueryParam], { type: 'hidden' })}

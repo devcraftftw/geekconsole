@@ -28,3 +28,4 @@ export * from './DataTable/DataTable.tsx';
 export * from './Separator/Separator.tsx';
 export * from './Command/Command.tsx';
 export * from './Logo/Logo.tsx';
+export * from './InputOTP/InputOTP.tsx';

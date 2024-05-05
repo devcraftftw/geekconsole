@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import * as fs from 'fs';
 import 'source-map-support/register.js';
-import { installGlobals } from '@remix-run/node';
 import chalk from 'chalk';
 import closeWithGrace from 'close-with-grace';
 import sourceMapSupport from 'source-map-support';
@@ -19,8 +18,6 @@ sourceMapSupport.install({
 		return null;
 	},
 });
-
-installGlobals();
 
 closeWithGrace(async ({ err }) => {
 	if (err) {

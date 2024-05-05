@@ -102,16 +102,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const prefilledProfile = verifySession.get(PREFILLED_PROFILE_KEY);
 
 	const formError = authSession.get(authenticator.sessionErrorKey);
+	const hasError = typeof formError === 'string';
 
 	return json({
 		email,
 		status: 'idle',
 		submission: {
-			status: 'error',
+			status: hasError ? 'error' : undefined,
 			initialValue: prefilledProfile ?? {},
-			error: {
-				'': typeof formError === 'string' ? [formError] : [],
-			},
+			error: { '': hasError ? [formError] : [] },
 		} as SubmissionResult,
 	});
 }

@@ -84,9 +84,10 @@ function App() {
 
 	const theme = useTheme();
 	const nonce = useNonce();
+	const allowIndexing = ENV.ALLOW_INDEXING !== 'false';
 
 	return (
-		<Document nonce={nonce} theme={theme}>
+		<Document nonce={nonce} theme={theme} allowIndexing={allowIndexing}>
 			<Outlet />
 
 			<script
@@ -103,7 +104,12 @@ function Document({
 	children,
 	nonce,
 	theme,
-}: PropsWithChildren<{ nonce: string; theme?: Theme }>) {
+	allowIndexing = true,
+}: PropsWithChildren<{
+	nonce: string;
+	theme?: Theme;
+	allowIndexing?: boolean;
+}>) {
 	return (
 		<html className={`${theme}`} lang="en">
 			<head>
@@ -114,6 +120,10 @@ function Document({
 				<meta charSet="utf-8" />
 				<meta name="description" content="Your favourite geek storage" />
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+				{allowIndexing ? null : (
+					<meta name="robots" content="noindex, nofollow" />
+				)}
 			</head>
 			<body className="flex min-h-screen flex-col items-center bg-background text-foreground">
 				{children}

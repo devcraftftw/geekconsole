@@ -9,6 +9,7 @@ import {
 	getUserId,
 } from '#app/core/server-utils/auth/auth.server.ts';
 import { prisma } from '#app/core/server-utils/db/db.server.ts';
+import { ensurePrimary } from '#app/core/server-utils/litefs/litefs.server.ts';
 import {
 	destroyRedirectToHeader,
 	getRedirectCookieValue,
@@ -29,6 +30,10 @@ import {
 const destroyRedirectTo = { 'set-cookie': destroyRedirectToHeader };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+	// this loader performs mutations, so we need to make sure we're on the
+	// primary instance to avoid writing to a read-only replica
+	await ensurePrimary();
+
 	const providerName = ProviderNameSchema.parse(params.provider);
 	const redirectTo = getRedirectCookieValue(request);
 	const label = providerLabels[providerName];
